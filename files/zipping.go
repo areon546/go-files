@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/areon546/go-helpers/helpers"
 )
 
 func EmptyZip() *ZipFile {
@@ -42,10 +40,10 @@ func NewZipFile(name string) *ZipFile {
 }
 
 func constructZipName(name string) string {
-	if helpers.Search("zip", strings.Split(name, ".")) > -1 {
+	if search("zip", strings.Split(name, ".")) > -1 {
 		return name
 	}
-	return helpers.Format("%s.zip", name)
+	return format("%s.zip", name)
 }
 
 func (z *ZipFile) GetName() string { return z.name }
@@ -98,19 +96,19 @@ func (c *ZipCrawler) HandleFolder(folderName os.DirEntry) {
 func (c *ZipCrawler) Crawl(filename string) {
 	c.path = filename
 
-	// check if it's a file or a folder
+	// // check if it's a file or a folder
 
-	dirEntry := OpenFile(filename)
+	// dirEntry := OpenFile(filename)
 
-	isFolder := false
+	// isFolder := false
 
-	if isFolder {
-		c.HandleFolder(dirEntry)
-	} else if !isFolder {
-		c.HandleFile(dirEntry)
-	} else {
+	// if isFolder {
+	// 	c.HandleFolder(dirEntry)
+	// } else if !isFolder {
+	// 	c.HandleFile(dirEntry)
+	// } else {
 
-	}
+	// }
 
 	// crawl
 }
@@ -118,7 +116,7 @@ func (c *ZipCrawler) Crawl(filename string) {
 func ZipFolderO(path, output string) {
 
 	// here we create the zip zipFile
-	zipFile, err := os.Create(helpers.Format("%s.zip", output))
+	zipFile, err := os.Create(format("%s.zip", output))
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +130,7 @@ func ZipFolderO(path, output string) {
 
 	// action performed at each file
 	walker := func(path string, info os.FileInfo, err error) error {
-		helpers.Printf("Crawling: %v", path)
+		printf("Crawling: %v", path)
 		if err != nil {
 			return err
 		}
@@ -164,7 +162,7 @@ func ZipFolderO(path, output string) {
 			return err
 		}
 
-		helpers.Printf("%v", fileBeingZipped)
+		printf("%v", fileBeingZipped)
 
 		// here we copy the contents in the physical file to the virtual file being zipped
 		_, err = io.Copy(fileBeingZipped, fileToZip)

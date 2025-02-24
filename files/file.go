@@ -4,8 +4,6 @@ import (
 	"io"
 	"log"
 	"os"
-
-	"github.com/areon546/go-helpers"
 )
 
 // ~~~~~~~~~~~~~~~~ File
@@ -50,7 +48,7 @@ func OpenFile(path string, d os.DirEntry) (f *File) { // TODO make the File stru
 	byteArr := make([]byte, fInf.Size())
 	osF.Read(byteArr)
 
-	strArr := helpers.BytesToString(byteArr)
+	strArr := bytesToString(byteArr)
 
 	f = NewFile(path, d.Name())
 	f.Append(strArr)
@@ -67,7 +65,7 @@ func (f *File) IsEmpty() bool {
 }
 
 func (f *File) Name() string {
-	return helpers.Format("%s.%s", f.filename, f.suffix)
+	return format("%s.%s", f.filename, f.suffix)
 }
 
 func (f *File) Contents() []byte {

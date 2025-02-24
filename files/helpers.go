@@ -18,7 +18,15 @@ func print(a ...any) {
 	helpers.Print(a...)
 }
 
+func printf(s string, a ...any) {
+	helpers.Printf(s, a...)
+}
+
+func search(s string, ss []string) int { return helpers.Search(s, ss) }
+
 func format(s string, a ...any) string { return helpers.Format(s, a...) }
+
+func bytesToString(b []byte) string { return helpers.BytesToString(b) }
 
 func splitFileName(filename string) (name, suffix string) {
 	stringSections := strings.Split(filename, ".")
@@ -48,6 +56,6 @@ func ConstructPath(preffix, directory, fileName string) (s string) {
 	return s
 }
 
-func FilesEqual(a, b File) bool {
-	return reflect.DeepEqual(a, b)
-}
+// func FilesEqual(a, b File) bool {
+// 	return reflect.DeepEqual(a, b)
+// }
