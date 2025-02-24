@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/areon546/NovaDriftCustomSkins/goPageMaker/helpers"
+	"github.com/areon546/go-helpers"
 )
 
 // helper functions

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/areon546/NovaDriftCustomSkins/goPageMaker/helpers"
+	"github.com/areon546/go-helpers"
 )
 
 func filterFiles(arr []os.DirEntry) (fs []File, folders []os.DirEntry) {
