@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/areon546/go-helpers"
+	"github.com/areon546/go-helpers/helpers"
 )
 
 // helper functions
