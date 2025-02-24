@@ -56,6 +56,6 @@ func ConstructPath(preffix, directory, fileName string) (s string) {
 	return s
 }
 
-// func FilesEqual(a, b File) bool {
-// 	return reflect.DeepEqual(a, b)
-// }
+func FilesEqual(a, b File) bool {
+	return reflect.DeepEqual(a, b)
+}
