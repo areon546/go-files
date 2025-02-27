@@ -96,19 +96,19 @@ func (c *ZipCrawler) HandleFolder(folderName os.DirEntry) {
 func (c *ZipCrawler) Crawl(filename string) {
 	c.path = filename
 
-	// // check if it's a file or a folder
+	// check if it's a file or a folder
 
-	// dirEntry := OpenFile(filename)
+	dirEntry := OpenFile(filename)
 
-	// isFolder := false
+	isFolder := false
 
-	// if isFolder {
-	// 	c.HandleFolder(dirEntry)
-	// } else if !isFolder {
-	// 	c.HandleFile(dirEntry)
-	// } else {
+	if isFolder {
+		c.HandleFolder(dirEntry)
+	} else if !isFolder {
+		c.HandleFile(dirEntry)
+	} else {
 
-	// }
+	}
 
 	// crawl
 }
