@@ -27,9 +27,9 @@ func NewFileWithSuffix(fn string, suff string, path string) *File {
 	return f
 }
 
-func NewFile(path, fn string) *File {
-	fn, suff := splitFileName(fn)
-	return NewFileWithSuffix(fn, suff, path)
+func NewFile(path, filename string) *File {
+	filename, suff := splitFileName(filename)
+	return NewFileWithSuffix(filename, suff, path)
 }
 
 func (f *File) setDefaults() *File {
@@ -55,6 +55,8 @@ func OpenFile(path string, d os.DirEntry) (f *File) { // TODO make the File stru
 
 	return
 }
+
+func openFile()
 
 func EmptyFile() *File {
 	return &File{}
