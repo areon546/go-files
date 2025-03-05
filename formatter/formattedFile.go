@@ -26,7 +26,7 @@ func NewMarkdownFile(name, path string) *FormattedFile {
 }
 
 func newFormattedFile(fmt Formatter, path, name, suffix string) *FormattedFile {
-	return &FormattedFile{TextFile: *fileIO.NewTextFileWithSuffix(path, name, "md"), Fmt: fmt}
+	return &FormattedFile{TextFile: *fileIO.NewTextFileWithSuffix(path, name, suffix), Fmt: fmt}
 }
 
 func (m *FormattedFile) AppendLink(displayText, path string) {

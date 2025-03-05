@@ -4,6 +4,20 @@ import (
 	"testing"
 )
 
+var (
+	rows      int   = 1
+	cols      int   = 5
+	headers   row   = setupHeaderRow()
+	rowValues []row = []row{}
+	t         Table = Table{table{headers: headers, rows: rowValues}}
+)
+
+func setupHeaderRow() row {
+	r := *NewRow(cols)
+
+	return r
+}
+
 func TestNewTable(t *testing.T) {
 	cols, rows := 1, 5
 	want := &Table{table{headers: *NewRow(cols), rows: makeRows(rows, cols)}}
@@ -12,10 +26,6 @@ func TestNewTable(t *testing.T) {
 	assertEqualsObject(t, want, get)
 }
 
-func TestNewRow(t *testing.T) {
-	l := 5
-	want := &row{cells: make([]cell, l), maxLen: l}
-	get := NewRow(l)
+func TestRows(t *testing.T) {
 
-	assertEqualsObject(t, want, get)
 }

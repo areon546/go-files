@@ -4,11 +4,6 @@ import (
 	"errors"
 )
 
-var (
-	ErrEndOfRow    = errors.New("fileIO: end of row")
-	ErrOutOfBounds = errors.New("fileIO: index out of bounds")
-)
-
 type TableConverter func(t table) string
 
 type Table struct{ table }
@@ -20,6 +15,7 @@ type table struct {
 func NewTable(cols, rows int) *Table {
 	return &Table{table{headers: *NewRow(cols), rows: makeRows(rows, cols)}}
 }
+
 func (t *table) Rows() int {
 	return len(t.rows)
 }
@@ -46,7 +42,7 @@ func (t *table) AddCol() {
 	}
 }
 
-func (t *table) AddHeader(index int, newHeader string) (err error) {
+func (t *table) SetHeader(index int, newHeader string) (err error) {
 	err = t.headers.Set(index, newHeader)
-	return errors.Join(err, errors.New(":end of headers"))
+	return errors.Join(err, errors.New(": end of headers"))
 }
