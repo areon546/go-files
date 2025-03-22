@@ -58,7 +58,8 @@ func OpenFile(path string, d os.DirEntry) (f *File) { // TODO make the File stru
 	return
 }
 
-func openFile()
+// Question. What the hell is this supposed to do?
+func openFile() {}
 
 func EmptyFile() *File {
 	return &File{}

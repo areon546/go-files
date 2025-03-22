@@ -96,6 +96,8 @@ func (c *ZipCrawler) HandleFolder(folderName os.DirEntry) {
 }
 
 func (c *ZipCrawler) Crawl(filename string) {
+	// // NOTE: I am trying to rewrite the ZipFolder function, and that uses the ZipCrawler
+	// // In order to do so, I need to work on this however this is in a temporary state haitus
 	// 	c.path = filename
 
 	// 	// check if it's a file or a folder
