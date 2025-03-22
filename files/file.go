@@ -21,6 +21,8 @@ type File struct {
 	bytesRead int
 }
 
+// Implements the following interfaces
+
 func NewFileWithSuffix(fn string, suff string, path string) *File {
 	f := &File{filename: fn, suffix: suff, relPath: path}
 	f.setDefaults()

@@ -63,7 +63,7 @@ func (z *ZipFile) WriteAndClose() {
 	z.file.Close()
 }
 
-func ZipFolder(folderPath, outputName string) {
+func ZipFolderN(folderPath, outputName string) {
 
 	z := NewZipFile(outputName)
 
@@ -115,7 +115,7 @@ func (c *ZipCrawler) Crawl(filename string) {
 	// // crawl
 }
 
-func ZipFolderO(path, output string) {
+func ZipFolder(path, output string) {
 
 	// here we create the zip zipFile
 	zipFile, err := os.Create(format("%s.zip", output))
