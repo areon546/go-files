@@ -4,14 +4,18 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/areon546/go-helpers/helpers"
 )
 
 // ~~~~~~~~~~~~~~~~ File
 
+// The File struct is supposed to handle the io.ReadWriter interface.
+// It treats files as binary objects that
 type File struct {
 	filename string
 	suffix   string
-	relPath  string
+	path     string
 
 	contentBuffer []byte
 	lines         int
@@ -21,48 +25,29 @@ type File struct {
 	bytesRead int
 }
 
-// Implements the following interfaces
+// Main Mehtods:
+/*
+Read - will read contents into specified array
+Write - will overwrite contents with specified array
 
-func NewFileWithSuffix(fn string, suff string, path string) *File {
-	f := &File{filename: fn, suffix: suff, relPath: path}
+Append - appends bytes to buffer
+Close - writes buffer
+
+
+
+*/
+
+// Creates a new file
+func NewFile(path, fn, suff string) *File {
+	f := &File{filename: fn, suffix: suff, path: path}
 	f.setDefaults()
 	return f
-}
-
-func NewFile(path, filename string) *File {
-	filename, suff := splitFileName(filename)
-	return NewFileWithSuffix(filename, suff, path)
 }
 
 func (f *File) setDefaults() *File {
 	f.hasBeenRead = false
 	f.linesRead = 0
 	return f
-}
-
-func OpenFile(path string, d os.DirEntry) (f *File) { // TODO make the File struct use byte slice rather than string slice
-	name := path + d.Name()
-
-	osF, err := os.Open(name)
-	handle(err)
-
-	fInf, _ := osF.Stat()
-	byteArr := make([]byte, fInf.Size())
-	osF.Read(byteArr)
-
-	strArr := bytesToString(byteArr)
-
-	f = NewFile(path, d.Name())
-	f.Append(strArr)
-
-	return
-}
-
-// Question. What the hell is this supposed to do?
-func openFile() {}
-
-func EmptyFile() *File {
-	return &File{}
 }
 
 func (f *File) IsEmpty() bool {
@@ -77,14 +62,23 @@ func (f *File) Contents() []byte {
 	return f.contentBuffer
 }
 
+// The 0664 is the permissions the file is written to with, however you can encode some additional stuff with it that isn't currently considered.
+func writeToFile(filename string, bytes []byte) error {
+	return os.WriteFile(filename, bytes, 0664)
+}
+
 func (f *File) ClearFile() {
-	if err := os.WriteFile(f.Name(), make([]byte, 0), 0666); err != nil {
-		log.Fatal(err)
-	}
+	err := writeToFile(f.Name(), make([]byte, 0))
+	log.Fatal(err)
+
+}
+
+// Writes the content buffer
+func (f *File) Close() {
+	f.Write(f.Contents())
 }
 
 // copied from io.go
-// Writer is the interface that wraps the basic Write method.
 //
 // Write writes len(p) bytes from p to the underlying data stream.
 // It returns the number of bytes written from p (0 <= n <= len(p))
@@ -94,15 +88,11 @@ func (f *File) ClearFile() {
 //
 // Implementations must not retain p.
 func (f *File) Write(p []byte) (n int, err error) {
-	if err := os.WriteFile(f.Name(), p, 0664); err != nil {
-		log.Fatal(err)
-	}
-
+	err = writeToFile(f.Name(), p)
 	return
 }
 
 // copied from io.go
-// Reader is the interface that wraps the basic Read method.
 //
 // Read reads up to len(p) bytes into p. It returns the number of bytes
 // read (0 <= n <= len(p)) and any error encountered. Even if Read
@@ -163,13 +153,27 @@ func (f *File) String() string {
 	return f.Name()
 }
 
-func (f *File) Append(s string) {
-	f.AppendLine(s)
+func (f *File) Append(bytes []byte) {
+	// adds bytes array given to the end of the buffer
+	f.contentBuffer = append(f.contentBuffer, bytes...)
 }
 
-func (f *File) AppendLine(s string) {
-	// adds string s to the end of the buffer, newline determines if it is the end of a line,
-	// however that really should be determined when writing to the file so lets ignore that
-	// especially since we can use the index we are appending to to determine if it's a new line or now
-	f.contentBuffer = append(f.contentBuffer, []byte(s)...)
+// Returns a basic, empty file
+func EmptyFile() *File {
+	return &File{}
+}
+
+// Loads file from memory, loading any contents into the file created
+func OpenFile(path string) (f *File) { // TODO make the File struct use byte slice rather than string slice
+
+	contents, err := os.ReadFile(path)
+	helpers.Handle(err)
+
+	name, suff := splitFileName(path)
+
+	f = NewFile(path, name, suff)
+
+	f.Append(contents)
+
+	return
 }

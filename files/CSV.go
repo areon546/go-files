@@ -6,15 +6,19 @@ import (
 )
 
 // ~~~~~~~~~~~~~~~~~~~~ CSVFile
-type CSVFile struct {
+type CSVFile struct { // TODO convert to table datastructure
 	TextFile
 	headings []string
 	contents [][]string
 }
 
 // returns an array of headings and a 2d array of
-func ReadCSV(fileName string) (csv CSVFile) {
-	file := NewTextFileWithSuffix("", fileName, "csv")
+func ReadCSV(filename string) (csv CSVFile) {
+
+	// check if fileName ends with csv
+	filename = trimFiletype(filename, "csv")
+
+	file := NewTextFileWithSuffix("", filename, "csv")
 	// read fileName into CSVFile
 
 	// file := makeFile(fileName)
@@ -39,7 +43,7 @@ func ReadCSV(fileName string) (csv CSVFile) {
 	return
 }
 
-func (c *CSVFile) GetIndexOfColumn(header string) (index int) {
+func (c *CSVFile) IndexOfCol(header string) (index int) {
 	for i, heading := range c.headings {
 		if reflect.DeepEqual(heading, header) {
 			index = i
@@ -49,16 +53,16 @@ func (c *CSVFile) GetIndexOfColumn(header string) (index int) {
 	return
 }
 
-func (c *CSVFile) GetRow(i int) string { // TODO make more efficient
+func (c *CSVFile) Row(i int) string { // TODO make more efficient
 	return strings.Join(c.contents[i], ",")
 	// return c.contentBuffer[i+1] // this is buggy, fix
 }
 
-func (c *CSVFile) GetCell(row, col int) string {
+func (c *CSVFile) Cell(row, col int) string {
 	return c.contents[row][col]
 }
 
-func (c *CSVFile) NumHeaders() int {
+func (c *CSVFile) Cols() int {
 	return len(c.headings)
 }
 
@@ -66,6 +70,6 @@ func (c *CSVFile) Rows() int {
 	return len(c.contents)
 }
 
-func (c *CSVFile) GetContents() [][]string {
+func (c *CSVFile) Contents() [][]string {
 	return c.contents
 }

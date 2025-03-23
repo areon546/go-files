@@ -4,3 +4,5 @@ github.com/areon546/go-helpers v0.0.0-20250224192320-8f603b8e366f h1:ZF7tnma+kJq
 github.com/areon546/go-helpers v0.0.0-20250224192320-8f603b8e366f/go.mod h1:pN+CQkoKXPG5/CV6P19/T3T9xcsKCtdj38zabkFuspA=
 github.com/areon546/go-helpers v0.0.0-20250227103607-105381c09850 h1:OTwIdrfAnBR8E9soks2YDfgNc9A3XyqsgIcQICfdTII=
 github.com/areon546/go-helpers v0.0.0-20250227103607-105381c09850/go.mod h1:pN+CQkoKXPG5/CV6P19/T3T9xcsKCtdj38zabkFuspA=
+github.com/areon546/go-helpers v0.0.0-20250303234539-3c5130368638 h1:lPvwCUpznIRCk7jBKr5ZH7Vy7NHlcxxFQh5Gu7iD+YY=
+github.com/areon546/go-helpers v0.0.0-20250303234539-3c5130368638/go.mod h1:pN+CQkoKXPG5/CV6P19/T3T9xcsKCtdj38zabkFuspA=

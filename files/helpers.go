@@ -32,12 +32,23 @@ func splitFileName(filename string) (name, suffix string) {
 	stringSections := strings.Split(filename, ".")
 	// print(stringSections)
 
+	if len(stringSections) == 1 {
+		name = stringSections[0]
+		suffix = ""
+		return
+	}
+
 	if len(stringSections) > 1 {
 		suffix = stringSections[len(stringSections)-1]
 	}
 
 	for i := 0; i < len(stringSections)-1; i++ {
 		name += stringSections[i]
+
+		// adds back any stripped '.'s apart from the last one
+		if i != len(stringSections)-2 {
+			name += "."
+		}
 	}
 
 	return
@@ -58,4 +69,25 @@ func ConstructPath(preffix, directory, fileName string) (s string) {
 
 func FilesEqual(a, b File) bool {
 	return reflect.DeepEqual(a, b)
+}
+
+func trimFiletype(filename, filetype string) string {
+	if filenameContains(filename, filetype) {
+		return removeFiletype(filename, filetype)
+	}
+	return filename
+}
+
+func filenameContains(filename, filetype string) bool {
+	filenameComponents := strings.Split(filename, ".")
+	if reflect.DeepEqual(filenameComponents[len(filenameComponents)-1], filetype) {
+		// filename type is filetype specified
+		return true
+	}
+
+	return false
+}
+
+func removeFiletype(filename, filetype string) string {
+	return strings.TrimRight(filename, ("." + filetype))
 }

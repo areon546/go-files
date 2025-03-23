@@ -77,44 +77,47 @@ func ZipFolderN(folderPath, outputName string) {
 type ZipCrawler struct {
 	ZipFile
 	path string
+	root string
 }
 
-func (c *ZipCrawler) HandleFile(filename os.DirEntry) {
-	// file := OpenFile()
+// To handle files, we simply write the file contents to the zip file in the location specified by the path.
+func (c *ZipCrawler) HandleFile(path string) {
+	file := files.OpenFile(path)
 
-	file := files.NewFile("", "")
-
-	print(filename.Name())
-
-	c.AddZipFile(filename.Name(), file) // TODO: OPEN FILE FOR CONTENTS
+	c.AddZipFile(path, file)
 }
 
-func (c *ZipCrawler) HandleFolder(folderName os.DirEntry) {
+// To handle folders we simply recursively call Crawl on the folder being zipped.
+func (c *ZipCrawler) HandleFolder(path string) {
 	originalPath := c.path
-	c.Crawl(originalPath + folderName.Name())
+
+	dirContents, err := os.ReadDir(path)
+	handle(err)
+
+	for _, dirEntry := range dirContents {
+		// for each dirEntry, handle if if it is a folder or file
+		entryPath := path + dirEntry.Name()
+		print(entryPath)
+
+		// c.Crawl(entryPath)
+	}
+
 	c.path = originalPath
 }
 
-func (c *ZipCrawler) Crawl(filename string) {
-	// // NOTE: I am trying to rewrite the ZipFolder function, and that uses the ZipCrawler
-	// // In order to do so, I need to work on this however this is in a temporary state haitus
-	// 	c.path = filename
+func (c *ZipCrawler) Crawl(path string) {
+	// NOTE: I am trying to rewrite the ZipFolder function, and that uses the ZipCrawler
+	// In order to do so, I need to work on this however this is in a temporary state haitus
+	c.path = path
 
-	// 	// check if it's a file or a folder
+	// 1 check if is folder or directory
+	isDir := true
 
-	// 	dirEntry := OpenFile(filename)
-
-	// 	isFolder := false
-
-	// 	if isFolder {
-	// 		c.HandleFolder(dirEntry)
-	// 	} else if !isFolder {
-	// 		c.HandleFile(dirEntry)
-	// 	} else {
-
-	// 	}
-
-	// // crawl
+	if isDir {
+		c.HandleFolder(path)
+	} else {
+		c.HandleFile(path)
+	}
 }
 
 func ZipFolder(path, output string) {

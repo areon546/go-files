@@ -4,6 +4,8 @@ import (
 	"errors"
 	"os"
 	"strings"
+
+	"github.com/areon546/go-helpers/helpers"
 )
 
 type TextFile struct {
@@ -12,12 +14,16 @@ type TextFile struct {
 }
 
 func NewTextFileWithSuffix(path, filename, suff string) *TextFile {
-	return &TextFile{File: *NewFileWithSuffix(filename, suff, path)}
+	return &TextFile{File: *NewFile(path, filename, suff)}
 }
 
 func NewTextFile(path, filename string) *TextFile {
 	filename, suff := splitFileName(filename)
 	return NewTextFileWithSuffix(filename, suff, path)
+}
+
+func (f *TextFile) Contents() []byte {
+	return f.contentBuffer
 }
 
 func (f *TextFile) ReadFile() []string {
@@ -60,7 +66,7 @@ func (t *TextFile) WriteLine(s string, i int, newline bool) {
 	}
 
 	t.textBuffer[i] = s
-	t.File.AppendLine(s)
+	t.File.Append(helpers.StringToBytes(s))
 }
 
 func (t *TextFile) AppendLastLine(s string) {
