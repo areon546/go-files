@@ -19,7 +19,7 @@ func NewTextFileWithSuffix(path, filename, suff string) *TextFile {
 
 func NewTextFile(path, filename string) *TextFile {
 	filename, suff := splitFileName(filename)
-	return NewTextFileWithSuffix(filename, suff, path)
+	return NewTextFileWithSuffix(path, filename, suff)
 }
 
 func (f *TextFile) Contents() []byte {
