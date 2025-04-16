@@ -18,7 +18,7 @@ func ReadCSV(filename string) (csv CSVFile) {
 	// check if fileName ends with csv
 	filename = trimFiletype(filename, "csv")
 
-	file := NewTextFileWithSuffix("", filename, "csv")
+	file := NewTextFile(ConstructFilePath("", filename, "csv"))
 	// read fileName into CSVFile
 
 	// file := makeFile(fileName)

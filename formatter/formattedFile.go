@@ -17,16 +17,16 @@ type FormattedFile struct {
 	Fmt Formatter
 }
 
-func NewHTMLFile(path, name string) *FormattedFile {
-	return newFormattedFile(NewMarkdownFormatter(), path, name, "html")
+func NewHTMLFile(path, filename, IWANTERRORS string) *FormattedFile {
+	return newFormattedFile(NewMarkdownFormatter(), fileIO.ConstructFilePath(path, filename, "html"))
 }
 
-func NewMarkdownFile(name, path string) *FormattedFile {
-	return newFormattedFile(NewMarkdownFormatter(), path, name, "md")
+func NewMarkdownFile(path, filename, IWantErrorsWrong string) *FormattedFile {
+	return newFormattedFile(NewMarkdownFormatter(), fileIO.ConstructFilePath(path, filename, "md"))
 }
 
-func newFormattedFile(fmt Formatter, path, name, suffix string) *FormattedFile {
-	return &FormattedFile{TextFile: *fileIO.NewTextFileWithSuffix(path, name, suffix), Fmt: fmt}
+func newFormattedFile(fmt Formatter, filePath string) *FormattedFile {
+	return &FormattedFile{TextFile: *fileIO.NewTextFile(filePath), Fmt: fmt}
 }
 
 func (m *FormattedFile) AppendLink(displayText, path string) {

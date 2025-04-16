@@ -28,45 +28,6 @@ func format(s string, a ...any) string { return helpers.Format(s, a...) }
 
 func bytesToString(b []byte) string { return helpers.BytesToString(b) }
 
-func splitFileName(filename string) (name, suffix string) {
-	stringSections := strings.Split(filename, ".")
-	// print(stringSections)
-
-	if len(stringSections) == 1 {
-		name = stringSections[0]
-		suffix = ""
-		return
-	}
-
-	if len(stringSections) > 1 {
-		suffix = stringSections[len(stringSections)-1]
-	}
-
-	for i := 0; i < len(stringSections)-1; i++ {
-		name += stringSections[i]
-
-		// adds back any stripped '.'s apart from the last one
-		if i != len(stringSections)-2 {
-			name += "."
-		}
-	}
-
-	return
-}
-
-func ConstructPath(preffix, directory, fileName string) (s string) {
-	if !reflect.DeepEqual(preffix, "") {
-		s += preffix + "/"
-	}
-
-	s += directory
-
-	if !reflect.DeepEqual(fileName, "") {
-		s += "/" + fileName
-	}
-	return s
-}
-
 func FilesEqual(a, b File) bool {
 	return reflect.DeepEqual(a, b)
 }

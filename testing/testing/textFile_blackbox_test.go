@@ -10,10 +10,10 @@ import (
 func TestNewTextFile(t *testing.T) {
 
 	t.Run("New Test file", func(t *testing.T) {
-		txt := files.NewTextFile("/testing-files/test.txt", "")
+		txt := files.NewTextFile("files/test.txt")
 
-		want := helpers.StringToBytes("[[dragons are the best]]")
-		get := txt.ReadFile()
+		want := "[[dragons are the best]]"
+		get := txt.ReadFile()[0]
 
 		helpers.AssertEqualsObject(t, want, get)
 	})

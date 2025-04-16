@@ -11,11 +11,16 @@ import (
 // ~~~~~~~~~~~~~~~~ File
 
 // The File struct is supposed to handle the io.ReadWriter interface.
-// It treats files as binary objects that
+// It treats files as binary objects, writing to them with bytes.
+//
+// There are two ways to iteract with this file system
+//  1. Calling file.Write(byteArr) will write directly the contents of the byte array into the file.
+//  2. Calling Append will buffer information into the content buffer, allowing the struct to act as a BufferedWriter in Java
+//     Note: When appending to the buffer, at the end you have to
 type File struct {
+	path     string
 	filename string
 	suffix   string
-	path     string
 
 	contentBuffer []byte
 	lines         int
@@ -37,16 +42,14 @@ Close - writes buffer
 
 */
 
-// Creates a new file
-func NewFile(path, fn, suff string) *File {
-	f := &File{filename: fn, suffix: suff, path: path}
-	f.setDefaults()
-	return f
-}
+func NewFile(filePath string) *File {
+	path, fn, suff := SplitFilePath(filePath)
 
-func (f *File) setDefaults() *File {
+	f := &File{path: path, filename: fn, suffix: suff}
+
 	f.hasBeenRead = false
 	f.linesRead = 0
+
 	return f
 }
 
@@ -55,7 +58,7 @@ func (f *File) IsEmpty() bool {
 }
 
 func (f *File) Name() string {
-	return format("%s.%s", f.filename, f.suffix)
+	return format("%s/%s.%s", f.path, f.filename, f.suffix)
 }
 
 func (f *File) Contents() []byte {
@@ -169,9 +172,7 @@ func OpenFile(path string) (f *File) { // TODO make the File struct use byte sli
 	contents, err := os.ReadFile(path)
 	helpers.Handle(err)
 
-	name, suff := splitFileName(path)
-
-	f = NewFile(path, name, suff)
+	f = NewFile(path)
 
 	f.Append(contents)
 

@@ -13,13 +13,8 @@ type TextFile struct {
 	textBuffer []string
 }
 
-func NewTextFileWithSuffix(path, filename, suff string) *TextFile {
-	return &TextFile{File: *NewFile(path, filename, suff)}
-}
-
-func NewTextFile(path, filename string) *TextFile {
-	filename, suff := splitFileName(filename)
-	return NewTextFileWithSuffix(path, filename, suff)
+func NewTextFile(filePath string) *TextFile {
+	return &TextFile{File: *NewFile(filePath)}
 }
 
 func (f *TextFile) Contents() []byte {
