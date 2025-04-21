@@ -52,3 +52,11 @@ func filenameContains(filename, filetype string) bool {
 func removeFiletype(filename, filetype string) string {
 	return strings.TrimRight(filename, ("." + filetype))
 }
+
+const debugMode = false
+
+func debugPrint(a ...any) {
+	if debugMode {
+		helpers.Print(a...)
+	}
+}
