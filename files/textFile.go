@@ -64,6 +64,11 @@ func (t *TextFile) WriteLine(s string, i int, newline bool) {
 	t.File.Append(helpers.StringToBytes(s))
 }
 
+func WriteBuffer()  {
+	t.File.Append(helpers.StringToBytes(t.textBuffer)
+}
+
+// ~~~ Append
 func (t *TextFile) AppendLastLine(s string) {
 	lastLine := len(t.contentBuffer) - 1
 
