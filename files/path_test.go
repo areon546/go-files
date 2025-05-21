@@ -60,29 +60,31 @@ func TestSplitFilePath(t *testing.T) {
 	// when splitting the filename, the cases we care about are:
 
 	var testCases = []struct {
-		message  string
+		message string
+
 		path     string
 		filename string
 		suffix   string
 	}{
-		{"./test.txt", "..", "./test", "txt"},
-		{"./test.txt.txt", ".", "./test.txt", "txt"},
-		{"../test.txt", "..", "../test", "txt"},
-		{"/test.txt", "", "/test", "txt"},
-		{"/test", "", "/test", ""},
+		{"./test.txt", "./", "test", "txt"},
+		{"./test.txt.txt", "./", "test.txt", "txt"},
+		{"../test.txt", "../", "test", "txt"},
+		{"/test.txt", "/", "test", "txt"},
+		{"/test", "/", "test", ""},
 		{"asd.md", "", "asd", "md"},
+		// {"../custom_skins/custom_skins", "", "", ""},
+		{"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
 	}
 
 	for _, test := range testCases {
 
-		path := test.path
 		filename := test.filename
 		suffix := test.suffix
 
 		name := helpers.Format("Test case: %s", test.message)
 
 		t.Run(name, func(t *testing.T) {
-			path, fn, sf := SplitFilePath(path)
+			path, fn, sf := SplitFilePath(test.message)
 
 			helpers.AssertEquals(t, test.path, path)
 			helpers.AssertEquals(t, filename, fn)

@@ -10,11 +10,13 @@ func ConstructFilePath(path, filename, filetype string) (filePath string) {
 }
 
 // This will isolate a directory path, a file name, and the file type from a specified file path.
+// If given a single line, it will
 func SplitFilePath(filePath string) (path, name, filetype string) {
 	stringSections := strings.Split(filePath, "/")
 	length := len(stringSections)
 
 	debugPrint("file name split up: ", stringSections)
+	print(stringSections, filePath)
 
 	if length == 0 {
 		// IE "" or "/" entered.
@@ -34,7 +36,7 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 		for i := range length - 1 {
 			debugPrint(i, stringSections[i])
 
-			path += stringSections[i]
+			path += stringSections[i] + "/"
 		}
 	}
 
