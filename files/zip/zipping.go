@@ -48,7 +48,7 @@ func constructZipName(name string) string {
 	return format("%s.zip", name)
 }
 
-func (z *ZipFile) GetName() string { return z.name }
+func (z *ZipFile) Name() string { return z.name }
 
 func (z *ZipFile) AddZipFile(filename string, contents io.Reader) {
 	fileWriter, err := z.writer.Create(filename)
