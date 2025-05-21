@@ -2,8 +2,6 @@ package files
 
 import (
 	"strings"
-
-	"github.com/areon546/go-helpers/helpers"
 )
 
 // This will join together the path, filename, and a specified file type.
@@ -16,7 +14,7 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 	stringSections := strings.Split(filePath, "/")
 	length := len(stringSections)
 
-	print("file name split up: ", stringSections)
+	debugPrint("file name split up: ", stringSections)
 
 	if length == 0 {
 		// IE "" or "/" entered.
@@ -34,13 +32,15 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 		// This means that directories have been entered that we have to process and add onto the path string
 
 		for i := range length - 1 {
-			helpers.Print(i, stringSections[i])
+			debugPrint(i, stringSections[i])
 
 			path += stringSections[i]
 		}
 	}
 
 	name, filetype = splitFileName(stringSections[length-1])
+
+	debugPrint(name, filetype)
 
 	return
 }

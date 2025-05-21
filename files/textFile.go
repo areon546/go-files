@@ -17,8 +17,8 @@ func NewTextFile(filePath string) *TextFile {
 	return &TextFile{File: *NewFile(filePath)}
 }
 
-func (f *TextFile) Contents() []byte {
-	return f.contentBuffer
+func (f *TextFile) Contents() []string {
+	return f.textBuffer
 }
 
 func (f *TextFile) ReadFile() []string {

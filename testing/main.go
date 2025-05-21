@@ -3,9 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/areon546/go-helpers/helpers"
-
 	"github.com/areon546/go-files/files"
+	"github.com/areon546/go-helpers/helpers"
 )
 
 func main() {

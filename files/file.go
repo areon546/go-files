@@ -28,7 +28,15 @@ type File struct {
 	hasBeenRead   bool
 
 	bytesRead int
+	status    string
 }
+
+/*
+File Creation:
+- NewFile - creates a fake file that needs to be written or closed to actually appear in the file system
+- OpenFile - reads from the OS, looking for a pre existing file with specified name, will buffer the file's contents into memory
+
+*/
 
 // Main Mehtods:
 /*
@@ -38,6 +46,8 @@ Write - will overwrite contents with specified array
 Append - appends bytes to buffer
 Close - writes buffer
 
+The file has a status indicator, that will be used to indicate error messages.
+EG if using File class in buffered readwriter, you want it
 
 
 */
@@ -49,6 +59,7 @@ func NewFile(filePath string) *File {
 
 	f.hasBeenRead = false
 	f.linesRead = 0
+	f.status = "UNKNOWN"
 
 	return f
 }
@@ -167,7 +178,7 @@ func EmptyFile() *File {
 }
 
 // Loads file from memory, loading any contents into the file created
-func OpenFile(path string) (f *File) { // TODO make the File struct use byte slice rather than string slice
+func OpenFile(path string) (f *File) {
 
 	contents, err := os.ReadFile(path)
 	helpers.Handle(err)
