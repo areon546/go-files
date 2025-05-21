@@ -64,8 +64,14 @@ func (t *TextFile) WriteLine(s string, i int, newline bool) {
 	t.File.Append(helpers.StringToBytes(s))
 }
 
-func WriteBuffer()  {
-	t.File.Append(helpers.StringToBytes(t.textBuffer)
+func (t *TextFile) WriteBuffer() {
+	// convert bytes buffer to bytes
+	textAsOneLine := strings.Join(t.textBuffer, "\n")
+
+	bytes := helpers.StringToBytes(textAsOneLine)
+
+	// write text buffer
+	t.Write(bytes)
 }
 
 // ~~~ Append
