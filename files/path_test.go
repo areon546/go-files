@@ -72,7 +72,7 @@ func TestSplitFilePath(t *testing.T) {
 		{"/test.txt", "/", "test", "txt"},
 		{"/test", "/", "test", ""},
 		{"asd.md", "", "asd", "md"},
-		// {"../custom_skins/custom_skins", "", "", ""},
+		{"../custom_skins/custom_skins", "a", "b", "c"},
 		{"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
 	}
 

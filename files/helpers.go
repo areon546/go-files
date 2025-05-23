@@ -28,6 +28,7 @@ func format(s string, a ...any) string { return helpers.Format(s, a...) }
 
 func bytesToString(b []byte) string { return helpers.BytesToString(b) }
 
+// unique ~~~~
 func FilesEqual(a, b File) bool {
 	return reflect.DeepEqual(a, b)
 }

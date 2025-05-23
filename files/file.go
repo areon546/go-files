@@ -4,6 +4,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"reflect"
 
 	"github.com/areon546/go-helpers/helpers"
 )
@@ -68,8 +69,25 @@ func (f *File) IsEmpty() bool {
 	return len(f.contentBuffer) == 0
 }
 
-func (f *File) Name() string {
-	return format("%s/%s.%s", f.path, f.filename, f.suffix)
+func (f *File) Name() (s string) {
+	path := f.path
+
+	if reflect.DeepEqual(path, "") {
+		path += "."
+	}
+
+	// check if path ends with a "/"
+	if path[len(path)-1] == '/' {
+		s += path
+	} else {
+		s += path + "/"
+	}
+
+	print(s)
+
+	s += f.filename + "." + f.suffix
+
+	return s
 }
 
 func (f *File) Contents() []byte {
@@ -84,7 +102,6 @@ func writeToFile(filename string, bytes []byte) error {
 func (f *File) ClearFile() {
 	err := writeToFile(f.Name(), make([]byte, 0))
 	log.Fatal(err)
-
 }
 
 // Writes the content buffer
@@ -179,7 +196,6 @@ func EmptyFile() *File {
 
 // Loads file from memory, loading any contents into the file created
 func OpenFile(path string) (f *File) {
-
 	contents, err := os.ReadFile(path)
 	helpers.Handle(err)
 
