@@ -120,6 +120,9 @@ func (f *File) Close() {
 // Implementations must not retain p.
 func (f *File) Write(p []byte) (n int, err error) {
 	err = writeToFile(f.Name(), p)
+	if err == nil { // tell the user that the file has been written to successfully, only if no error occurs
+		n = len(p) // simplistic answer
+	}
 	return
 }
 
