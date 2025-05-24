@@ -12,38 +12,38 @@ type (
 		Output(a ...any)
 	}
 
-	PrintLogger struct{}
-	FileLogger  struct {
+	printLogger struct{}
+	fileLogger  struct {
 		logFile files.TextFile
 	}
-	NoLogger struct{}
+	noLogger struct{}
 
 	Logger struct {
 		logOut LogOutput
 	}
 )
 
-func newPrintLogger() *PrintLogger {
-	return &PrintLogger{}
+func NewPrintLogger() *printLogger {
+	return &printLogger{}
 }
 
-func (logger PrintLogger) Output(a ...any) {
+func (logger printLogger) Output(a ...any) {
 	helpers.Print(a...)
 }
 
-func newFileLogger(filePath string) *FileLogger {
-	return &FileLogger{logFile: *files.NewTextFile(filePath)}
+func NewFileLogger(filePath string) *fileLogger {
+	return &fileLogger{logFile: *files.NewTextFile(filePath)}
 }
 
-func (logger FileLogger) Output(a ...any) {
+func (logger fileLogger) Output(a ...any) {
 	logger.logFile.AppendNewLine(fmt.Sprint(a...))
 }
 
-func NewNoLogger() *NoLogger {
-	return &NoLogger{}
+func NewNoLogger() *noLogger {
+	return &noLogger{}
 }
 
-func (logger NoLogger) Output(a ...any) {
+func (logger noLogger) Output(a ...any) {
 }
 
 // Logger
