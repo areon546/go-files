@@ -16,7 +16,7 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 	length := len(stringSections)
 
 	debugPrint("file name split up: ", stringSections)
-	print(stringSections, filePath)
+	debugPrint(stringSections, filePath)
 
 	if length == 0 {
 		// IE "" or "/" entered.
