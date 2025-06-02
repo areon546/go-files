@@ -83,8 +83,6 @@ func (f *File) Name() (s string) {
 		s += path + "/"
 	}
 
-	print(s)
-
 	s += f.filename + "." + f.suffix
 
 	return s
