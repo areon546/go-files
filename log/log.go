@@ -9,7 +9,8 @@ import (
 
 type (
 	LogOutput interface {
-		Output(a ...any)
+		Output(a ...any) // used to transfer data to any buffer
+		Close()          // used to close any IO streams that need to be closed, eg File IO
 	}
 
 	printLogger struct{}
@@ -23,6 +24,7 @@ type (
 	}
 )
 
+// PRINT LOGGER
 func NewPrintLogger() *printLogger {
 	return &printLogger{}
 }
@@ -31,20 +33,31 @@ func (logger printLogger) Output(a ...any) {
 	helpers.Print(a...)
 }
 
+func (logger printLogger) Close() {
+}
+
+// FILE LOGGER
 func NewFileLogger(filePath string) *fileLogger {
 	return &fileLogger{logFile: *files.NewTextFile(filePath)}
 }
 
 func (logger fileLogger) Output(a ...any) {
 	logger.logFile.AppendNewLine(fmt.Sprint(a...))
-	logger.logFile.WriteBuffer()
 }
 
+func (logger fileLogger) Close() {
+	logger.logFile.Close()
+}
+
+// NO LOG
 func NewNoLogger() *noLogger {
 	return &noLogger{}
 }
 
 func (logger noLogger) Output(a ...any) {
+}
+
+func (logger noLogger) Close() {
 }
 
 // Logger
