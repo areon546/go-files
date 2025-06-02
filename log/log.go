@@ -37,6 +37,7 @@ func NewFileLogger(filePath string) *fileLogger {
 
 func (logger fileLogger) Output(a ...any) {
 	logger.logFile.AppendNewLine(fmt.Sprint(a...))
+	logger.logFile.WriteBuffer()
 }
 
 func NewNoLogger() *noLogger {
