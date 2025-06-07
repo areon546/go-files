@@ -107,17 +107,17 @@ func appendToFile(filename string, bytes []byte) (err error) {
 	return err
 }
 
-func (f *File) ClearFile() {
-	err := writeToFile(f.Name(), make([]byte, 0))
-	log.Fatal(err)
+func (f *File) ClearFile() error {
+	return writeToFile(f.Name(), make([]byte, 0))
 }
 
 // Writes the content buffer
 func (f *File) Close() {
 	f.ClearFile()
 	_, err := f.Write(f.Contents())
-
-	log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // copied from io.go
