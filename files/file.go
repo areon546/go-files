@@ -94,7 +94,17 @@ func (f *File) Contents() []byte {
 
 // The 0664 is the permissions the file is written to with, however you can encode some additional stuff with it that isn't currently considered.
 func writeToFile(filename string, bytes []byte) error {
-	return os.WriteFile(filename, bytes, 0664)
+	return os.WriteFile(filename, bytes, 0644)
+}
+
+func appendToFile(filename string, bytes []byte) (err error) {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(bytes)
+	return err
 }
 
 func (f *File) ClearFile() {
@@ -104,7 +114,10 @@ func (f *File) ClearFile() {
 
 // Writes the content buffer
 func (f *File) Close() {
-	f.Write(f.Contents())
+	f.ClearFile()
+	_, err := f.Write(f.Contents())
+
+	log.Fatal(err)
 }
 
 // copied from io.go
@@ -117,8 +130,8 @@ func (f *File) Close() {
 //
 // Implementations must not retain p.
 func (f *File) Write(p []byte) (n int, err error) {
-	err = writeToFile(f.Name(), p)
-	if err == nil { // tell the user that the file has been written to successfully, only if no error occurs
+	err = appendToFile(f.Name(), p) // NOTE: this hass to append to fulfill the html template system, presumably stream means appending in this case
+	if err == nil {                 // tell the user that the file has been written to successfully, only if no error occurs
 		n = len(p) // simplistic answer
 	}
 	return
