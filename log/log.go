@@ -34,6 +34,7 @@ func (logger printLogger) Output(a ...any) {
 }
 
 func (logger printLogger) Close() {
+	DebugPrint("closing print logger: ")
 }
 
 // FILE LOGGER
@@ -42,10 +43,14 @@ func NewFileLogger(filePath string) *fileLogger {
 }
 
 func (logger fileLogger) Output(a ...any) {
+	DebugPrint("logfile contents: ", logger.logFile.Contents())
+
 	logger.logFile.AppendNewLine(fmt.Sprint(a...))
 }
 
 func (logger fileLogger) Close() {
+	DebugPrint("closing file logger ")
+
 	logger.logFile.Close()
 }
 
@@ -55,9 +60,11 @@ func NewNoLogger() *noLogger {
 }
 
 func (logger noLogger) Output(a ...any) {
+	DebugPrint("no log ", a)
 }
 
 func (logger noLogger) Close() {
+	DebugPrint("closing no loger")
 }
 
 // Logger
