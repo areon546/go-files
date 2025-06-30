@@ -1,50 +1,86 @@
 package files
 
 import (
+	"errors"
+	"io/fs"
+	"os"
 	"strings"
 )
 
 // This will join together the path, filename, and a specified file type.
 func ConstructFilePath(path, filename, filetype string) (filePath string) {
-	return path + "/" + filename + filetype
+	filePath = path + "/" + filename + filetype
+
+	debugPrint("ConstructFilePath: params: ", path, filename, filetype)
+	debugPrint("ConstructFilePath: return: ", filePath)
+
+	return
+}
+
+// This will split up a file path into it's constituting directories, and filename.
+func SplitDirectories(filePath string) (dirs []string, filename string) {
+	stringSections := strings.Split(filePath, "/")
+	length := len(stringSections)
+	debugPrint("SplitDirectories: file path", filePath, ", split up: ", stringSections)
+
+	// Check if filePath is a directory or a file
+	filePresent := 0
+	info, err := os.Stat(filePath)
+
+	// os.Stat returns either:
+	// nil Err
+
+	if err != nil {
+		debugPrint("SplitDirectories: os.Stat Error", err)
+
+		if errors.Is(err, fs.ErrNotExist) {
+			// If the filePath object doesn't exist, we will assume that if the last stringSection of the filePath has a dot, it will be a file.
+
+			if strings.Contains(stringSections[length-1], ".") {
+				filePresent = 1
+			} // TODO: causes bug where if the directory somehow contains a dot in it, it is possible (sometimes) that an error will be formed.
+		} else {
+			handle(err)
+		}
+	} else if !info.IsDir() {
+		filePresent = 1
+	}
+
+	dirs = stringSections[0 : length-filePresent]
+	if filePresent == 1 {
+		filename = stringSections[length-1]
+	} else {
+		filename = ""
+	}
+
+	debugPrint("SplitDirectories return values: ", dirs, filename)
+	return
 }
 
 // This will isolate a directory path, a file name, and the file type from a specified file path.
 // If given a single line, it will
 func SplitFilePath(filePath string) (path, name, filetype string) {
-	stringSections := strings.Split(filePath, "/")
-	length := len(stringSections)
+	dirs, filename := SplitDirectories(filePath)
+	length := len(dirs)
+	debugPrint("SplitFilePath dirs:", dirs, "filename", filename)
 
-	debugPrint("file name split up: ", stringSections)
-	debugPrint(stringSections, filePath)
-
-	if length == 0 {
-		// IE "" or "/" entered.
-		return
-	}
-
-	if length == 1 {
-		// This means that only a filename has been entered (eg TEST.MD).
-		path = ""
-	}
-
-	// Split up filename
-
-	if length > 1 {
+	if length > 0 {
 		// This means that directories have been entered that we have to process and add onto the path string
 
-		for i := range length - 1 {
-			debugPrint(i, stringSections[i])
+		for i := range length {
+			dir := dirs[i]
 
-			path += stringSections[i] + "/"
+			debugPrint("SplitFilePath: appending / to each dir: ", i, dir)
+
+			path += dir + "/"
 		}
 	}
 
-	name, filetype = splitFileName(stringSections[length-1])
+	name, filetype = splitFileName(filename)
+	debugPrint("SplitFilePath: ", "fn", filename, "name", name, "suff", filetype)
 
-	debugPrint(name, filetype)
-
-	return
+	debugPrint("Return values: ", path, name, filetype)
+	return path, name, filetype
 }
 
 // Name is the whole name up to the very very last .xxx at the end of a filename.
@@ -53,6 +89,8 @@ func splitFileName(filename string) (name, filetype string) {
 	// split it up by .'s
 	startOfFileType := strings.LastIndex(filename, ".")
 
+	debugPrint("splitFileName inputs:", filename, startOfFileType)
+
 	if startOfFileType == -1 {
 		// IE no actual . found in `filename`.
 		return filename, ""
@@ -60,5 +98,6 @@ func splitFileName(filename string) (name, filetype string) {
 
 	name = filename[0:startOfFileType]
 	filetype = filename[startOfFileType+1:]
+	debugPrint("splitFileName outputs:", name, filetype)
 	return
 }

@@ -17,3 +17,5 @@ func ReadDirectory(dirPath string) (entries []fs.DirEntry) {
 	}
 	return
 }
+
+// TODO: make directory function?

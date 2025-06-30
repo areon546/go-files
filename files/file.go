@@ -54,15 +54,17 @@ EG if using File class in buffered readwriter, you want it
 */
 
 func NewFile(filePath string) *File {
+	debugPrint("Creating new file at path: ", filePath)
 	path, fn, suff := SplitFilePath(filePath)
 
-	f := &File{path: path, filename: fn, suffix: suff}
+	f := File{path: path, filename: fn, suffix: suff}
 
 	f.hasBeenRead = false
 	f.linesRead = 0
 	f.status = "UNKNOWN"
 
-	return f
+	debugPrint("New File created", filePath, &f, "filename:", fn, "suffix:", suff, "filename:", f.filename)
+	return &f
 }
 
 func (f *File) IsEmpty() bool {

@@ -6,6 +6,7 @@ var debugMode = false
 
 func debugPrint(a ...any) {
 	if debugMode {
+		helpers.Print("fileIO")
 		helpers.Print(a...)
 	}
 }

@@ -27,8 +27,11 @@ func TestName(t *testing.T) {
 		t.Run(tC.desc, func(t *testing.T) {
 			// open file
 			file := NewFile(tC.path)
+			name := file.Name()
 
-			helpers.AssertEquals(t, tC.expected, file.Name())
+			print("TEST TEST TEST", file.filename)
+
+			helpers.AssertEquals(t, tC.expected, name)
 		})
 	}
 }
