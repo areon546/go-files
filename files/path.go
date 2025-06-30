@@ -1,9 +1,6 @@
 package files
 
 import (
-	"errors"
-	"io/fs"
-	"os"
 	"strings"
 )
 
@@ -25,25 +22,14 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 
 	// Check if filePath is a directory or a file
 	filePresent := false
-	info, err := os.Stat(filePath)
+	exists, info := FileExists(filePath)
 
-	// os.Stat returns either:
-	// nil Err
-
-	if err != nil {
-		debugPrint("SplitDirectories: os.Stat Error", err)
-
-		if errors.Is(err, fs.ErrNotExist) {
-			// If the filePath object doesn't exist, we will assume that if the last stringSection of the filePath has a dot, it will be a file.
-
-			if strings.Contains(stringSections[length-1], ".") {
-				filePresent = true
-			} // TODO: causes bug where if the directory somehow contains a dot in it, it is possible (sometimes) that an error will be formed.
-		} else {
-			handle(err)
-		}
-	} else if !info.IsDir() {
-		filePresent = true
+	if exists {
+		filePresent := !info.IsDir()
+	} else {
+		if strings.Contains(stringSections[length-1], ".") {
+			filePresent = true
+		} // TODO: causes bug where if the directory somehow contains a dot in it, it is possible (sometimes) that an error will be formed.
 	}
 
 	if filePresent {
