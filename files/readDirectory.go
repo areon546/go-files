@@ -21,7 +21,7 @@ func ReadDirectory(dirPath string) (entries []fs.DirEntry) {
 
 // Checks if a specific file exists within the file system or not.
 // If it does exist, it returns true, and the os.FileInfo entry that can be gained by os.Stat.
-// If it does not exist, it returns false, nill.
+// If it does not exist, it returns false, nil.
 func FileExists(path string) (exists bool, info os.FileInfo) {
 	info, err := os.Stat(path)
 

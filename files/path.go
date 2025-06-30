@@ -24,7 +24,7 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 	debugPrint("SplitDirectories: file path", filePath, ", split up: ", stringSections)
 
 	// Check if filePath is a directory or a file
-	filePresent := 0
+	filePresent := false
 	info, err := os.Stat(filePath)
 
 	// os.Stat returns either:
@@ -37,20 +37,28 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 			// If the filePath object doesn't exist, we will assume that if the last stringSection of the filePath has a dot, it will be a file.
 
 			if strings.Contains(stringSections[length-1], ".") {
-				filePresent = 1
+				filePresent = true
 			} // TODO: causes bug where if the directory somehow contains a dot in it, it is possible (sometimes) that an error will be formed.
 		} else {
 			handle(err)
 		}
 	} else if !info.IsDir() {
-		filePresent = 1
+		filePresent = true
 	}
 
-	dirs = stringSections[0 : length-filePresent]
-	if filePresent == 1 {
+	if filePresent {
+		dirs = stringSections[0 : length-1]
 		filename = stringSections[length-1]
 	} else {
+		dirs = stringSections[0 : length-0]
 		filename = ""
+	}
+
+	// When the filePath is specifically that of a directory, and ends with a "/", dirs ends with an empty string.
+	// The empty string can be removed.
+	lenDir := len(dirs)
+	if dirs[lenDir-1] == "" {
+		dirs = dirs[0 : lenDir-1]
 	}
 
 	debugPrint("SplitDirectories return values: ", dirs, filename)
