@@ -25,7 +25,7 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 	exists, info := FileExists(filePath)
 
 	if exists {
-		filePresent := !info.IsDir()
+		filePresent = !info.IsDir()
 	} else {
 		if strings.Contains(stringSections[length-1], ".") {
 			filePresent = true
@@ -43,7 +43,7 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 	// When the filePath is specifically that of a directory, and ends with a "/", dirs ends with an empty string.
 	// The empty string can be removed.
 	lenDir := len(dirs)
-	if dirs[lenDir-1] == "" {
+	if lenDir > 0 && dirs[lenDir-1] == "" {
 		dirs = dirs[0 : lenDir-1]
 	}
 
