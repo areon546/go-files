@@ -23,4 +23,5 @@ func TestNewTextFile(t *testing.T) {
 }
 
 func TestConentsTextFile(t *testing.T) {
+	// TODO: test contents of a text file are: correct
 }

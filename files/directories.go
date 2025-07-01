@@ -8,10 +8,10 @@ import (
 )
 
 var (
-	filesErr        = errors.New("files: ")
-	notDirectoryErr = errors.New("Specified path not a directory, must end with '/': ")
+	errFiles        = errors.New("files: ")
+	errNotDirectory = errors.New("specified path not a directory, must end with '/': ")
 
-	ErrNotDir = errors.Join(filesErr, notDirectoryErr)
+	ErrNotDir = errors.Join(errFiles, errNotDirectory)
 )
 
 // This file contains all of the methods relating to directory management and checking.
