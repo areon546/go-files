@@ -28,10 +28,26 @@ func FileExists(path string) (exists bool, info os.FileInfo) {
 	if errors.Is(err, fs.ErrNotExist) {
 		exists = false
 	} else {
-		exists = true
+		exists = true && !info.IsDir()
 	}
 
 	return
 }
 
-// TODO: make directory function?
+// Checks if a specific directory exists.
+func DirExists(path string) (exists bool, info os.FileInfo) {
+	info, err := os.Stat(path)
+
+	if errors.Is(err, fs.ErrNotExist) {
+		exists = false
+	} else {
+		exists = true && info.IsDir()
+	}
+
+	return
+}
+
+// Creates directories at the specified path.
+func MakeDirectory(path string) error {
+	return os.MkdirAll(path, os.ModePerm)
+}
