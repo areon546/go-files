@@ -1,16 +1,14 @@
-package files_test
+package files
 
 import (
 	"testing"
 
-	"github.com/areon546/go-files/files"
 	"github.com/areon546/go-helpers/helpers"
 )
 
 func TestNewTextFile(t *testing.T) {
-
 	t.Run("Open Existing file", func(t *testing.T) {
-		txt := files.NewTextFile("files/test.txt")
+		txt := NewTextFile("files/test.txt")
 
 		want := "[[dragons are the best]]"
 		get := txt.ReadFile()[0]
@@ -22,9 +20,7 @@ func TestNewTextFile(t *testing.T) {
 	t.Run("Open file that doesn't exist", func(t *testing.T) {
 		// txt := files.NewTextFile("files/test2/txt")
 	})
-
 }
 
 func TestConentsTextFile(t *testing.T) {
-
 }

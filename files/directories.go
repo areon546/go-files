@@ -7,6 +7,15 @@ import (
 	"os"
 )
 
+var (
+	filesErr        = errors.New("files: ")
+	notDirectoryErr = errors.New("Specified path not a directory, must end with '/': ")
+
+	ErrNotDir = errors.Join(filesErr, notDirectoryErr)
+)
+
+// This file contains all of the methods relating to directory management and checking.
+
 // This function
 func ReadDirectory(dirPath string) (entries []fs.DirEntry) {
 	debugPrint("Reading directory ", dirPath)
@@ -48,6 +57,16 @@ func DirExists(path string) (exists bool, info os.FileInfo) {
 }
 
 // Creates directories at the specified path.
+// Returns an error if there is an issue creating the directories, or if the path is not a directory path.
 func MakeDirectory(path string) error {
-	return os.MkdirAll(path, os.ModePerm)
+	if PathIsDir(path) {
+		return os.MkdirAll(path, os.ModePerm)
+	} else {
+		return errors.Join(ErrNotDir, errors.New(path))
+	}
+}
+
+// Checks if the path specified is that of a directory.
+func PathIsDir(path string) bool {
+	return path[len(path)-1] == '/'
 }
