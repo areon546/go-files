@@ -39,7 +39,7 @@ type file struct {
 File Creation:
 - NewFile - creates a fake file that needs to be written or closed to actually appear in the file system
 - OpenFile - reads from the OS, looking for a pre existing file with specified name, will buffer the file's contents into memory
-- EmptyFile - creates an uneditable file.
+- EmptyFile - creates an uneditable file
 
 */
 
@@ -114,22 +114,6 @@ func appendToFile(filename string, bytes []byte) (err error) {
 	return err
 }
 
-// Resets the actual file's contents.
-func (f *File) ClearFile() error {
-	return writeToFile(f.Name(), make([]byte, 0))
-}
-
-// Writes the content buffer to the file in the file system.
-func (f *File) Close() error {
-	err := f.ClearFile()
-	if err != nil {
-		return err
-	}
-
-	_, err = f.Write(f.Contents())
-	return err
-}
-
 // copied from io.go
 //
 // Write writes len(p) bytes from p to the underlying data stream.
@@ -141,6 +125,7 @@ func (f *File) Close() error {
 // Implementations must not retain p.
 
 // Fulfills io.Writer interface.
+// Writes to the file, appending the given bytes.
 func (f *File) Write(p []byte) (n int, err error) {
 	err = appendToFile(f.Name(), p) // NOTE: this hass to append to fulfill the html template system, presumably stream means appending in this case
 	if err == nil {                 // tell the user that the file has been written to successfully, only if no error occurs
@@ -182,6 +167,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 // Implementations must not retain p.
 
 // Fulfills io.Reader interface.
+// Reads the file, and returns the number of bytes read.
 func (f File) Read(p []byte) (n int, err error) {
 	l := len(f.contentBuffer)
 	i := 0
@@ -212,6 +198,22 @@ func (f File) Read(p []byte) (n int, err error) {
 func (f *File) Append(bytes []byte) {
 	// adds bytes array given to the end of the buffer
 	f.contentBuffer = append(f.contentBuffer, bytes...)
+}
+
+// Resets the actual file's contents.
+func (f *File) ClearFile() error {
+	return writeToFile(f.Name(), make([]byte, 0))
+}
+
+// Writes the content buffer to the file in the file system.
+func (f *File) Close() error {
+	err := f.ClearFile()
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(f.Contents())
+	return err
 }
 
 /* Misc methods */
