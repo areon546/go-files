@@ -2,6 +2,7 @@ package files
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -11,7 +12,7 @@ var (
 	errFiles        = errors.New("files: ")
 	errNotDirectory = errors.New("specified path not a directory, must end with '/': ")
 
-	ErrNotDir = errors.Join(errFiles, errNotDirectory)
+	ErrNotDir = fmt.Errorf("%w%w", errFiles, errNotDirectory)
 )
 
 // This file contains all of the methods relating to directory management and checking.
