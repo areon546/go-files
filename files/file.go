@@ -2,7 +2,6 @@ package files
 
 import (
 	"io"
-	"log"
 	"os"
 	"reflect"
 
@@ -18,24 +17,29 @@ import (
 //  1. Calling file.Write(byteArr) will write directly the contents of the byte array into the file.
 //  2. Calling Append will buffer information into the content buffer, allowing the struct to act as a BufferedWriter in Java
 //     Note: When appending to the buffer, at the end you have to
+//
+// Promises of the File struct
+// - it will fulfill the io.ReadWriteCloser interface
 type File struct {
+	file
+}
+
+type file struct {
 	path     string
 	filename string
 	suffix   string
 
 	contentBuffer []byte
-	lines         int
-	linesRead     int
 	hasBeenRead   bool
 
 	bytesRead int
-	status    string
 }
 
 /*
 File Creation:
 - NewFile - creates a fake file that needs to be written or closed to actually appear in the file system
 - OpenFile - reads from the OS, looking for a pre existing file with specified name, will buffer the file's contents into memory
+- EmptyFile - creates an uneditable file.
 
 */
 
@@ -47,58 +51,59 @@ Write - will overwrite contents with specified array
 Append - appends bytes to buffer
 Close - writes buffer
 
-The file has a status indicator, that will be used to indicate error messages.
-EG if using File class in buffered readwriter, you want it
-
-
 */
 
+/* ~~~~~~~~ Creating File objects ~~~~~~~~ */
+
+// Loads file from memory, loading any contents into the file created.
+// The intended way to create files if they exist within memory.
+func OpenFile(path string) (f *File) {
+	contents, err := os.ReadFile(path)
+	helpers.Handle(err)
+
+	f = NewFile(path)
+
+	f.Append(contents)
+
+	return
+}
+
+// Creates a new file at a specified directory.
+// Promises of a 'NewFile':
+// * will be created regardless
+// * the new file will have empty contents, inte
 func NewFile(filePath string) *File {
 	debugPrint("Creating new file at path: ", filePath)
 	path, fn, suff := SplitFilePath(filePath)
 
-	f := File{path: path, filename: fn, suffix: suff}
+	f := file{path: path, filename: fn, suffix: suff}
 
 	f.hasBeenRead = false
-	f.linesRead = 0
-	f.status = "UNKNOWN"
 
 	debugPrint("New File created", filePath, &f, "filename:", fn, "suffix:", suff, "filename:", f.filename)
-	return &f
+	return &File{f}
 }
 
-func (f *File) IsEmpty() bool {
-	return len(f.contentBuffer) == 0
+// Returns a basic, empty file for use in comparisons when a method has to return a file but has an inssue. Equivalent of `nil`.
+// Promises of an Empty File:
+// * empty name
+// * empty content buffer
+// * unable to read
+// * unable to write
+func EmptyFile() *File {
+	return &File{file: file{}}
 }
 
-func (f *File) Name() (s string) {
-	path := f.path
-
-	if reflect.DeepEqual(path, "") {
-		path += "."
-	}
-
-	// check if path ends with a "/"
-	if path[len(path)-1] == '/' {
-		s += path
-	} else {
-		s += path + "/"
-	}
-
-	s += f.filename + "." + f.suffix
-
-	return s
-}
-
-func (f *File) Contents() []byte {
-	return f.contentBuffer
-}
+/* ~~~~~ Writing and Reading ~~~~~~~ */
 
 // The 0664 is the permissions the file is written to with, however you can encode some additional stuff with it that isn't currently considered.
+
+// Writes to the specified file.
 func writeToFile(filename string, bytes []byte) error {
 	return os.WriteFile(filename, bytes, 0644)
 }
 
+// Appends to the specified file.
 func appendToFile(filename string, bytes []byte) (err error) {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -109,17 +114,20 @@ func appendToFile(filename string, bytes []byte) (err error) {
 	return err
 }
 
+// Resets the actual file's contents.
 func (f *File) ClearFile() error {
 	return writeToFile(f.Name(), make([]byte, 0))
 }
 
-// Writes the content buffer
-func (f *File) Close() {
-	f.ClearFile()
-	_, err := f.Write(f.Contents())
+// Writes the content buffer to the file in the file system.
+func (f *File) Close() error {
+	err := f.ClearFile()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	_, err = f.Write(f.Contents())
+	return err
 }
 
 // copied from io.go
@@ -131,6 +139,8 @@ func (f *File) Close() {
 // Write must not modify the slice data, even temporarily.
 //
 // Implementations must not retain p.
+
+// Fulfills io.Writer interface.
 func (f *File) Write(p []byte) (n int, err error) {
 	err = appendToFile(f.Name(), p) // NOTE: this hass to append to fulfill the html template system, presumably stream means appending in this case
 	if err == nil {                 // tell the user that the file has been written to successfully, only if no error occurs
@@ -170,6 +180,8 @@ func (f *File) Write(p []byte) (n int, err error) {
 // nothing happened; in particular it does not indicate EOF.
 //
 // Implementations must not retain p.
+
+// Fulfills io.Reader interface.
 func (f File) Read(p []byte) (n int, err error) {
 	l := len(f.contentBuffer)
 	i := 0
@@ -196,28 +208,48 @@ func (f File) Read(p []byte) (n int, err error) {
 	return
 }
 
-func (f *File) String() string {
-	return f.Name()
-}
-
+// Appends the byte array passed through to the end of the content buffer.
 func (f *File) Append(bytes []byte) {
 	// adds bytes array given to the end of the buffer
 	f.contentBuffer = append(f.contentBuffer, bytes...)
 }
 
-// Returns a basic, empty file
-func EmptyFile() *File {
-	return &File{}
+/* Misc methods */
+
+// Checks if the file has nothing stored in the content buffer / written to it.
+func (f *File) IsEmpty() bool {
+	return len(f.contentBuffer) == 0
 }
 
-// Loads file from memory, loading any contents into the file created
-func OpenFile(path string) (f *File) {
-	contents, err := os.ReadFile(path)
-	helpers.Handle(err)
+// Returns the contents stored in the file buffer.
+func (f *File) Contents() []byte {
+	return f.contentBuffer
+}
 
-	f = NewFile(path)
+// Returns the path of the file.
+func (f *File) String() string {
+	return f.Name()
+}
 
-	f.Append(contents)
+// Returns the full name of the file.
+// The path + the file name.
+func (f *File) Name() string {
+	return f.Path() + f.filename + "." + f.suffix
+}
 
-	return
+// Returns the directory of the specified file.
+// Promise: Must end with a '/'
+func (f *File) Path() string {
+	path := f.path
+
+	if reflect.DeepEqual(path, "") {
+		path += "."
+	}
+
+	// check if path ends with a "/"
+	if !PathIsDir(path) {
+		path += "/"
+	}
+
+	return path
 }

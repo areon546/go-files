@@ -6,6 +6,16 @@ import (
 	"github.com/areon546/go-helpers/helpers"
 )
 
+var (
+	realFile  File = *NewFile("test.txt")
+	fakeFile  File = *NewFile("faketest.txt")
+	emtpyFile File = *EmptyFile()
+)
+
+func init() {
+	// Set up values for tests to make
+}
+
 func TestName(t *testing.T) {
 	testCases := []struct {
 		desc     string

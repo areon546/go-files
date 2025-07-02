@@ -11,6 +11,7 @@ import (
 type TextFile struct {
 	File
 	textBuffer []string
+	lines      int
 }
 
 func NewTextFile(filePath string) *TextFile {
@@ -51,7 +52,6 @@ func (f *TextFile) ReadLine(lineNum int) (output string, err error) {
 }
 
 func (t *TextFile) WriteLine(s string, i int, newline bool) {
-
 	for i >= len(t.textBuffer) {
 		t.textBuffer = append(t.textBuffer, "")
 	}
