@@ -7,6 +7,9 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"regexp"
+
+	"github.com/areon546/go-helpers/helpers"
 )
 
 var (
@@ -82,12 +85,42 @@ func CleanUpDirs(dirs []string) []string {
 	newDirs := make([]string, 0)
 
 	for _, dir := range dirs {
-		dotDirectory := reflect.DeepEqual(dir, ".")
+		validDirectory := ValidDirectoryName(dir)
 
-		if !dotDirectory {
+		debugPrint(helpers.Format("CleanUpDirs processing: %t '%s'", validDirectory, dir))
+
+		if validDirectory {
 			newDirs = append(newDirs, dir)
 		}
 	}
 
 	return newDirs
+}
+
+func ValidDirectoryName(dir string) (isValid bool) {
+	validCharRegex := "[A-Za-z0-9\\.\\_\\-]+" // [A-Za-z0-9\.\_\-]+
+	// Follows the POSIX Portable Character
+	// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_282
+	containsOnlySpacesRegex := "\\ [\\ ]*" // \ [\ ]*
+
+	dotDirectory := reflect.DeepEqual(dir, ".")
+
+	validCharacters, err := regexp.MatchString(validCharRegex, dir) // regex check for whether it contains only valid characters - gonna make it
+	helpers.Handle(err)
+
+	onlySpaces, err := regexp.MatchString(containsOnlySpacesRegex, dir) // regex check for whether it contains only spaces
+	helpers.Handle(err)
+
+	isValid = !dotDirectory && !onlySpaces && validCharacters
+
+	debugPrint("ValidDirectoryName output", isValid, ":", !dotDirectory, !onlySpaces, validCharacters)
+
+	return
+}
+
+func ValidFileName(file string) (isValid bool) {
+	return
+}
+
+func validPosixName() {
 }

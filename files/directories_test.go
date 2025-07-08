@@ -69,9 +69,14 @@ func TestCleanUpDirs(t *testing.T) {
 		expectedDirs []string
 	}{
 		{
-			desc:         "Test Stripping directories of .",
-			inputDirs:    []string{"asdasd", ".", ".", "asdasdasd "},
-			expectedDirs: []string{"asdasd", "asdasdasd "},
+			desc:         "Test Stripping directories of '.'",
+			inputDirs:    []string{"asdasd", ".", ".", "asdasdasd"},
+			expectedDirs: []string{"asdasd", "asdasdasd"},
+		},
+		{
+			desc:         "Test Stripping directories of (SPACE)",
+			inputDirs:    []string{"aa", " ", "asd", "aaas"},
+			expectedDirs: []string{"aa", "asd", "aaas"},
 		},
 		// {
 		// 	desc:         "",
@@ -81,7 +86,71 @@ func TestCleanUpDirs(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			helpers.AssertEqualsObject(t, tC.expectedDirs, CleanUpDirs(tC.inputDirs))
+			cleanedUpDirs := CleanUpDirs(tC.inputDirs)
+
+			helpers.AssertEqualsObject(t, tC.expectedDirs, cleanedUpDirs)
+		})
+	}
+}
+
+func TestValidDirectoryName(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		input    string
+		expected bool
+	}{
+		{
+			desc:     "Forbid (SPACE) when alone (One)",
+			input:    " ",
+			expected: false,
+		},
+		{
+			desc:     "Forbid (SPACE) when alone (Many)",
+			input:    "       ",
+			expected: false,
+		},
+		{
+			desc:     "Forbid starting with (SPACE)",
+			input:    " asd",
+			expected: false,
+		},
+		{
+			desc:     "Forbid ending with (SPACE)",
+			input:    "asd ",
+			expected: false,
+		},
+		{
+			desc:     "Forbid . as only character",
+			input:    ".",
+			expected: false,
+		},
+		{
+			desc:     "Allow '.' when not alone",
+			input:    "directories.pretending.to.be.files.is.annoying",
+			expected: true,
+		},
+		{
+			desc:     "Allow '-'",
+			input:    "kebabs-are-tasty",
+			expected: true,
+		},
+		{
+			desc:     "Allow '_'",
+			input:    "words_are_powerful",
+			expected: true,
+		},
+		// {
+		// 	desc:     "",
+		// 	input:    "",
+		// 	expected: false,
+		// },
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			isValid := ValidDirectoryName(tC.input)
+
+			// print(isValid, tC)
+			helpers.AssertEqualsBool(t, tC.expected, isValid)
 		})
 	}
 }
