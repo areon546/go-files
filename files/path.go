@@ -55,6 +55,8 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 // If given a single line, it will
 func SplitFilePath(filePath string) (path, name, filetype string) {
 	dirs, filename := SplitDirectories(filePath)
+	// NOTE: I could make this slightly more optimised by not turning the filepath into a string array and then joining it back up again.
+	// However, there are some rules that I want to be sure are maintained, and there are more important things.
 	length := len(dirs)
 	debugPrint("SplitFilePath dirs:", dirs, "filename", filename)
 

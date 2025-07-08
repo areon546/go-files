@@ -1,6 +1,7 @@
 package files
 
 import (
+	"errors"
 	"io"
 	"os"
 	"reflect"
@@ -25,12 +26,13 @@ type File struct {
 }
 
 type file struct {
-	path     string
+	path     string // path attribute has to be a directory, ie ending with a `/`
 	filename string
 	suffix   string
 
-	contentBuffer []byte
-	hasBeenRead   bool
+	contentBuffer    []byte
+	compiledFilePath string
+	hasBeenRead      bool
 
 	bytesRead int
 }
@@ -57,14 +59,11 @@ Close - writes buffer
 
 // Loads file from memory, loading any contents into the file created.
 // The intended way to create files if they exist within memory.
-func OpenFile(path string) (f *File) {
-	contents, err := os.ReadFile(path)
-	helpers.Handle(err)
-
+func OpenFile(path string) (f *File, err error) {
 	f = NewFile(path)
+	err = f.ReadContents()
 
-	f.Append(contents)
-
+	helpers.Handle(err)
 	return
 }
 
@@ -168,7 +167,12 @@ func (f *File) Write(p []byte) (n int, err error) {
 
 // Fulfills io.Reader interface.
 // Reads the file, and returns the number of bytes read.
-func (f File) Read(p []byte) (n int, err error) {
+func (f *File) Read(p []byte) (n int, err error) {
+	pathEmpty := reflect.DeepEqual(f.path, "")
+	if pathEmpty {
+		return 0, ErrPathEmpty
+	}
+
 	l := len(f.contentBuffer)
 	i := 0
 
@@ -192,6 +196,16 @@ func (f File) Read(p []byte) (n int, err error) {
 	// helpers.Print(l, len(p), f.Name(), "bytes read", f.bytesRead)
 	// time.Sleep(time.Millisecond * 400)
 	return
+}
+
+// Read the contents of the file into the file buffer.
+// Allows a user to create a file using `NewFile` and then later load the contents into the buffer as desired.
+func (f *File) ReadContents() error {
+	contents, err := os.ReadFile(f.Name())
+
+	print("contents", contents, errors.Is(err, os.ErrNotExist))
+	f.Append(contents)
+	return err
 }
 
 // Appends the byte array passed through to the end of the content buffer.
@@ -218,7 +232,7 @@ func (f *File) Close() error {
 
 /* Misc methods */
 
-// Checks if the file has nothing stored in the content buffer / written to it.
+// Returns if the file buffer is empty.
 func (f *File) IsEmpty() bool {
 	return len(f.contentBuffer) == 0
 }
@@ -242,16 +256,20 @@ func (f *File) Name() string {
 // Returns the directory of the specified file.
 // Promise: Must end with a '/'
 func (f *File) Path() string {
-	path := f.path
+	pathNotCompiled := reflect.DeepEqual(f.compiledFilePath, "")
+	if pathNotCompiled {
+		path := f.path
+		if reflect.DeepEqual(path, "") {
+			path += "."
+		}
 
-	if reflect.DeepEqual(path, "") {
-		path += "."
+		// check if path ends with a "/"
+		if !PathIsDir(path) {
+			path += "/"
+		}
+
+		f.compiledFilePath = path
 	}
 
-	// check if path ends with a "/"
-	if !PathIsDir(path) {
-		path += "/"
-	}
-
-	return path
+	return f.compiledFilePath
 }

@@ -71,3 +71,15 @@ func MakeDirectory(path string) error {
 func PathIsDir(path string) bool {
 	return path[len(path)-1] == '/'
 }
+
+func CleanUpDirs(dirs []string) []string {
+	newDirs := make([]string, 0)
+
+	for index, dir := range dirs {
+		print(index, dir)
+
+		newDirs := 
+	}
+
+	return nil
+}
