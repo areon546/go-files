@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"reflect"
 )
 
 var (
@@ -72,14 +73,21 @@ func PathIsDir(path string) bool {
 	return path[len(path)-1] == '/'
 }
 
+// Returns processes a dirs array, such as one returned by files.SplitDirectories.
+// Main consequences:
+//   - removes any "." directories due to redundancy
+//
+// Should this return an error if relative imports go up more times than exist within the function?
 func CleanUpDirs(dirs []string) []string {
 	newDirs := make([]string, 0)
 
-	for index, dir := range dirs {
-		print(index, dir)
+	for _, dir := range dirs {
+		dotDirectory := reflect.DeepEqual(dir, ".")
 
-		newDirs := 
+		if !dotDirectory {
+			newDirs = append(newDirs, dir)
+		}
 	}
 
-	return nil
+	return newDirs
 }

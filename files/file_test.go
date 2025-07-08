@@ -95,41 +95,41 @@ func TestEmptyFile(t *testing.T) {
 
 /* ~~~ Reading and Writing */
 
-func TestClearFile(t *testing.T) {
-	// test file with data written to the file, data will be overwritten
-	// t.Run("File Emptied", func(t *testing.T) {
-	// })
-	// test file with data in buffer that buffer will not be overwritten
-	t.Run("File Emptied but buffer not Emptied", func(t *testing.T) {})
-}
-
-func TestWrite(t *testing.T) {
-	t.Run("", func(t *testing.T) {})
-}
-
-func TestRead(t *testing.T) {
-	t.Run("", func(t *testing.T) {})
-}
-
-/* ~~~ Misc */
-
-// IsEmpty
-func TestIsEmpty(t *testing.T) {
-	t.Run("", func(t *testing.T) {})
-
-	t.Run("", func(t *testing.T) {})
-}
-
-// Contents
-func TestConentsFile(t *testing.T) {
-	t.Run("", func(t *testing.T) {})
-}
-
-// String
-func TestString(t *testing.T) {
-	t.Run("Test String returns path to file object", func(t *testing.T) {
-	})
-}
+// func TestClearFile(t *testing.T) {
+// 	// test file with data written to the file, data will be overwritten
+// 	// t.Run("File Emptied", func(t *testing.T) {
+// 	// })
+// 	// test file with data in buffer that buffer will not be overwritten
+// 	t.Run("File Emptied but buffer not Emptied", func(t *testing.T) {})
+// }
+//
+// func TestWrite(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {})
+// }
+//
+// func TestRead(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {})
+// }
+//
+// /* ~~~ Misc */
+//
+// // IsEmpty
+// func TestIsEmpty(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {})
+//
+// 	t.Run("", func(t *testing.T) {})
+// }
+//
+// // Contents
+// func TestConentsFile(t *testing.T) {
+// 	t.Run("", func(t *testing.T) {})
+// }
+//
+// // String
+// func TestString(t *testing.T) {
+// 	t.Run("Test String returns path to file object", func(t *testing.T) {
+// 	})
+// }
 
 // Name
 func TestName(t *testing.T) {

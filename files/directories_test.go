@@ -59,3 +59,29 @@ func TestPathIsDir(t *testing.T) {
 		})
 	}
 }
+
+func TestCleanUpDirs(t *testing.T) {
+	t.Run("", func(t *testing.T) {})
+
+	testCases := []struct {
+		desc         string
+		inputDirs    []string
+		expectedDirs []string
+	}{
+		{
+			desc:         "Test Stripping directories of .",
+			inputDirs:    []string{"asdasd", ".", ".", "asdasdasd "},
+			expectedDirs: []string{"asdasd", "asdasdasd "},
+		},
+		// {
+		// 	desc:         "",
+		// 	inputDirs:    []string{},
+		// 	expectedDirs: []string{},
+		// },
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			helpers.AssertEqualsObject(t, tC.expectedDirs, CleanUpDirs(tC.inputDirs))
+		})
+	}
+}
