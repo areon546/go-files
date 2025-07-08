@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/areon546/go-files/files"
+	"github.com/areon546/go-helpers/helpers"
 )
 
 func EmptyZip() *ZipFile {
@@ -64,7 +65,6 @@ func (z *ZipFile) WriteAndClose() {
 }
 
 func ZipFolderN(folderPath, outputName string) {
-
 	z := NewZipFile(outputName)
 
 	// Crawl through folder
@@ -82,7 +82,9 @@ type ZipCrawler struct {
 
 // To handle files, we simply write the file contents to the zip file in the location specified by the path.
 func (c *ZipCrawler) HandleFile(path string) {
-	file := files.OpenFile(path)
+	file, err := files.OpenFile(path)
+
+	helpers.Handle(err)
 
 	c.AddZipFile(path, file)
 }
@@ -121,7 +123,6 @@ func (c *ZipCrawler) Crawl(path string) {
 }
 
 func ZipFolder(path, output string) {
-
 	// here we create the zip zipFile
 	zipFile, err := os.Create(format("%s.zip", output))
 	if err != nil {
@@ -185,5 +186,4 @@ func ZipFolder(path, output string) {
 	if err != nil {
 		panic(err)
 	}
-
 }
