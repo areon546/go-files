@@ -1,6 +1,7 @@
 package files
 
 import (
+	"os"
 	"testing"
 
 	"github.com/areon546/go-helpers/helpers"
@@ -51,7 +52,7 @@ func TestOpenFile(t *testing.T) {
 	t.Run("Non-existant File", func(t *testing.T) {
 		_, err := OpenFile("files/faketest.txt")
 
-		helpers.AssertError(t, err, ErrNotDir)
+		helpers.AssertError(t, err, os.ErrNotExist)
 	})
 }
 

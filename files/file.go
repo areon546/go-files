@@ -1,12 +1,9 @@
 package files
 
 import (
-	"errors"
 	"io"
 	"os"
 	"reflect"
-
-	"github.com/areon546/go-helpers/helpers"
 )
 
 // ~~~~~~~~~~~~~~~~ File
@@ -62,8 +59,6 @@ Close - writes buffer
 func OpenFile(path string) (f *File, err error) {
 	f = NewFile(path)
 	err = f.ReadContents()
-
-	helpers.Handle(err)
 	return
 }
 
@@ -200,10 +195,10 @@ func (f *File) Read(p []byte) (n int, err error) {
 
 // Read the contents of the file into the file buffer.
 // Allows a user to create a file using `NewFile` and then later load the contents into the buffer as desired.
+// Returns:
+// - os.ErrNotExist if the file object does not exist in the file system.
 func (f *File) ReadContents() error {
 	contents, err := os.ReadFile(f.Name())
-
-	print("contents", contents, errors.Is(err, os.ErrNotExist))
 	f.Append(contents)
 	return err
 }
