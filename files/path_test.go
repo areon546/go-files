@@ -117,3 +117,24 @@ func TestSplitFileName(t *testing.T) {
 		})
 	}
 }
+
+func TestJoinDirs(t *testing.T) {
+	testCases := []struct {
+		desc string
+		dirs []string
+		path string
+	}{
+		{
+			desc: "Joinging adds a directory sign at the end",
+			dirs: []string{"asd", "asd"},
+			path: "asd/asd/",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			path := JoinDirs(tC.dirs)
+
+			helpers.AssertEquals(t, tC.path, path)
+		})
+	}
+}

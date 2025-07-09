@@ -79,6 +79,10 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 	return path, name, filetype
 }
 
+func JoinDirs(dirs []string) (dirPath string) {
+	return strings.Join(dirs, "/") + "/"
+}
+
 // Name is the whole name up to the very very last .xxx at the end of a filename.
 // EG asd.jar.JAR.jar.txt will consider the filename as asd.jar.JAR.jar and the type as txt
 func splitFileName(filename string) (name, filetype string) {
