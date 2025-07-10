@@ -98,15 +98,11 @@ func CleanUpDirs(dirs []string) []string {
 }
 
 func ValidDirectoryName(dir string) (isValid bool) {
-	validCharRegex := "[A-Za-z0-9\\.\\_\\-]+" // [A-Za-z0-9\.\_\-]+
-	// Follows the POSIX Portable Character
-	// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_282
 	containsOnlySpacesRegex := "\\ [\\ ]*" // \ [\ ]*
 
 	dotDirectory := reflect.DeepEqual(dir, ".")
 
-	validCharacters, err := regexp.MatchString(validCharRegex, dir) // regex check for whether it contains only valid characters - gonna make it
-	helpers.Handle(err)
+	validCharacters := validPosixName(dir) // regex check for whether it contains only valid characters
 
 	onlySpaces, err := regexp.MatchString(containsOnlySpacesRegex, dir) // regex check for whether it contains only spaces
 	helpers.Handle(err)
@@ -122,5 +118,17 @@ func ValidFileName(file string) (isValid bool) {
 	return
 }
 
-func validPosixName() {
+func validPosixName(name string) (isValid bool) {
+	validCharRegex := "[A-Za-z0-9\\.\\_\\-]+" // [A-Za-z0-9\.\_\-]+
+	// Follows the POSIX Portable Character
+	// https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_282
+
+	validCharacters, err := regexp.MatchString(validCharRegex, name) // regex check for whether it contains only valid characters - gonna make it
+	if err != nil {
+		return false
+	}
+
+	isValid = validCharacters
+
+	return isValid
 }
