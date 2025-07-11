@@ -67,12 +67,6 @@ func MakeDirectory(path string) error {
 	if PathIsDir(path) {
 		err := os.MkdirAll(path, os.ModePerm)
 
-		print("Error", err)
-		// if err == os.ErrNotExist {
-		// 	print("Error does not exist received, try again")
-		// 	return nil
-		// }
-
 		return err
 
 	} else {
