@@ -65,7 +65,16 @@ func DirExists(path string) (exists bool, info os.FileInfo) {
 // Returns an error if there is an issue creating the directories, or if the path is not a directory path.
 func MakeDirectory(path string) error {
 	if PathIsDir(path) {
-		return os.MkdirAll(path, os.ModePerm)
+		err := os.MkdirAll(path, os.ModePerm)
+
+		print("Error", err)
+		// if err == os.ErrNotExist {
+		// 	print("Error does not exist received, try again")
+		// 	return nil
+		// }
+
+		return err
+
 	} else {
 		return errors.Join(ErrNotDir, errors.New(path))
 	}
@@ -102,7 +111,7 @@ func ValidDirectoryName(dir string) (isValid bool) {
 
 	dotDirectory := reflect.DeepEqual(dir, ".")
 
-	validCharacters := validPosixName(dir) // regex check for whether it contains only valid characters
+	validCharacters := validPosixName(dir) // regex check for only containing valid POSIX characters
 
 	onlySpaces, err := regexp.MatchString(containsOnlySpacesRegex, dir) // regex check for whether it contains only spaces
 	helpers.Handle(err)
@@ -114,8 +123,10 @@ func ValidDirectoryName(dir string) (isValid bool) {
 	return
 }
 
-func ValidFileName(file string) (isValid bool) {
-	return
+// Checks if the filename specified is valid.
+// Should it check if the path is a valid posix name or only the filename is a valid posix name ?
+func ValidFileName(filename string) (isValid bool) {
+	return false
 }
 
 func validPosixName(name string) (isValid bool) {
