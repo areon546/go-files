@@ -8,13 +8,19 @@ import (
 )
 
 var (
-	realFile  File = *NewFile("test.txt")
-	fakeFile  File = *NewFile("faketest.txt")
-	emtpyFile File = *EmptyFile()
+	realFile  File
+	fakeFile  File
+	emtpyFile File
 )
 
 func init() {
 	// Set up values for tests to make
+	print("Setting up file_test")
+	defer print("Finished setting up file_test\n")
+
+	realFile = *NewFile("test.txt")
+	fakeFile = *NewFile("faketest.txt")
+	emtpyFile = *EmptyFile()
 
 	realFile.Append([]byte("[dragons are cool]"))
 }

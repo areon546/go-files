@@ -6,7 +6,7 @@ import (
 
 // This will join together the path, filename, and a specified file type.
 func ConstructFilePath(path, filename, filetype string) (filePath string) {
-	filePath = path + "/" + filename + filetype
+	filePath = path + filename + "." + filetype
 
 	debugPrint("ConstructFilePath: params: ", path, filename, filetype)
 	debugPrint("ConstructFilePath: return: ", filePath)
@@ -16,43 +16,33 @@ func ConstructFilePath(path, filename, filetype string) (filePath string) {
 
 // This will split up a file path into it's constituting directories, and filename.
 func SplitDirectories(filePath string) (dirs []string, filename string) {
-	stringSections := strings.Split(filePath, "/")
-	length := len(stringSections)
-	debugPrint("SplitDirectories: file path", filePath, ", split up: ", stringSections)
+	debugPrint("SplitDirectories inputs:", filePath)
 
-	// Check if filePath is a directory or a file
-	filePresent := false
-	exists, info := FileExists(filePath)
+	lastDirIndex := strings.LastIndex(filePath, "/")
 
-	if exists {
-		filePresent = !info.IsDir()
-	} else {
-		if strings.Contains(stringSections[length-1], ".") {
-			filePresent = true
-		} // TODO: causes bug where if the directory somehow contains a dot in it, it is possible (sometimes) that an error will be formed.
+	if lastDirIndex == -1 {
+		// No directories within file Path
+		dirs = []string{}
+		// NOTE: For some reason, the default initialisation of a []string in the function definition, is not equal to this.
+		// And the tests fail if you don't reinitialise it.
+		filename = filePath
+
+		return
 	}
 
-	if filePresent {
-		dirs = stringSections[0 : length-1]
-		filename = stringSections[length-1]
-	} else {
-		dirs = stringSections[0 : length-0]
-		filename = ""
-	}
+	dirString := filePath[0:lastDirIndex]
+	filename = filePath[lastDirIndex+1:]
 
-	// When the filePath is specifically that of a directory, and ends with a "/", dirs ends with an empty string.
-	// The empty string can be removed.
-	lenDir := len(dirs)
-	if lenDir > 0 && dirs[lenDir-1] == "" {
-		dirs = dirs[0 : lenDir-1]
-	}
+	dirs = strings.Split(dirString, "/")
 
 	debugPrint("SplitDirectories return values: ", dirs, filename)
 	return
 }
 
 // This will isolate a directory path, a file name, and the file type from a specified file path.
-// If given a single line, it will
+// Rule: Directories end with `/`
+// Rule: Files don't end with a `/`
+// When processing directory or not, if the last one has a dot in it,
 func SplitFilePath(filePath string) (path, name, filetype string) {
 	dirs, filename := SplitDirectories(filePath)
 	// NOTE: I could make this slightly more optimised by not turning the filepath into a string array and then joining it back up again.

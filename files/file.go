@@ -209,7 +209,7 @@ func (f *File) Append(bytes []byte) {
 	f.contentBuffer = append(f.contentBuffer, bytes...)
 }
 
-// Resets the actual file's contents.
+// Resets the actual file's contents. Helpful if writing to a pre-existing file and you don't care about the original content.
 func (f *File) ClearFile() error {
 	return writeToFile(f.Name(), make([]byte, 0))
 }

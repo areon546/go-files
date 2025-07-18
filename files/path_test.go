@@ -55,6 +55,56 @@ Do I want it to support windows using forward slashes? Yes. No reason to be peda
 // 		})
 // 	}
 // }
+//
+//
+
+func TestSplitDirectories(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		filePath string
+		dirs     []string
+		filename string
+	}{
+		{
+			desc:     "Multiple dirs, name without `.`",
+			filePath: "asd/asd/a",
+			dirs:     []string{"asd", "asd"},
+			filename: "a",
+		},
+		{
+			desc:     "Multiple dirs, name with `.`",
+			filePath: "asd/asda/a.text",
+			dirs:     []string{"asd", "asda"},
+			filename: "a.text",
+		},
+		{
+			desc:     "Pure Directory",
+			filePath: "asd/",
+			dirs:     []string{"asd"},
+			filename: "",
+		},
+		{
+			desc:     "Pure Filename",
+			filePath: "asd",
+			dirs:     []string{},
+			filename: "asd",
+		},
+		// {
+		// 	desc:     "",
+		// 	filePath: "",
+		// 	dirs:     []string{},
+		// 	filename: "",
+		// },
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			dirs, filename := SplitDirectories(tC.filePath)
+
+			helpers.AssertEqualsObject(t, tC.dirs, dirs)
+			helpers.AssertEquals(t, tC.filename, filename)
+		})
+	}
+}
 
 func TestSplitFilePath(t *testing.T) {
 	// when splitting the filename, the cases we care about are:
@@ -66,12 +116,12 @@ func TestSplitFilePath(t *testing.T) {
 		filename string
 		suffix   string
 	}{
-		// {"./test.txt", "./", "test", "txt"},
-		// {"./test.txt.txt", "./", "test.txt", "txt"},
-		// {"../test.txt", "../", "test", "txt"},
-		// {"/test.txt", "/", "test", "txt"},
-		// {"/test", "/", "test", ""},
-		// {"asd.md", "", "asd", "md"},
+		{"./test.txt1", "./", "test", "txt1"},
+		{"./test.txt.txt2", "./", "test.txt", "txt2"},
+		{"../test.txt3", "../", "test", "txt3"},
+		{"/test.txt4", "/", "test", "txt4"},
+		{"/test", "/", "test", ""},
+		{"asd.md6", "", "asd", "md6"},
 		// {"../custom_skins/custom_skins", "a", "b", "c"},
 		// {"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
 	}
@@ -81,9 +131,7 @@ func TestSplitFilePath(t *testing.T) {
 		filename := test.filename
 		suffix := test.suffix
 
-		name := helpers.Format("Test case: %s", test.message)
-
-		t.Run(name, func(t *testing.T) {
+		t.Run(" "+test.message, func(t *testing.T) {
 			path, fn, sf := SplitFilePath(test.message)
 
 			helpers.AssertEquals(t, test.path, path)
