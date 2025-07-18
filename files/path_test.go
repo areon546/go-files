@@ -122,8 +122,8 @@ func TestSplitFilePath(t *testing.T) {
 		{"/test.txt4", "/", "test", "txt4"},
 		{"/test", "/", "test", ""},
 		{"asd.md6", "", "asd", "md6"},
-		// {"../custom_skins/custom_skins", "a", "b", "c"},
-		// {"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
+		{"../custom_skins/custom_skins", "../custom_skins/", "custom_skins", ""},
+		{"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
 	}
 
 	for _, test := range testCases {
