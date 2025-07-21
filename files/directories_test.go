@@ -52,6 +52,11 @@ func TestPathIsDir(t *testing.T) {
 			path:     "asd",
 			expected: false,
 		},
+		{
+			desc:     "Empty Directories",
+			path:     "",
+			expected: false,
+		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {

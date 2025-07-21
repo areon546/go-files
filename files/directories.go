@@ -2,7 +2,6 @@ package files
 
 import (
 	"errors"
-	"fmt"
 	"io/fs"
 	"log"
 	"os"
@@ -16,7 +15,7 @@ var (
 	errFiles        = errors.New("files: ")
 	errNotDirectory = errors.New("specified path not a directory, must end with '/': ")
 
-	ErrNotDir = fmt.Errorf("%w%w", errFiles, errNotDirectory)
+	ErrNotDir = helpers.WrapError("%w%w", errFiles, errNotDirectory)
 )
 
 // This file contains all of the methods relating to directory management and checking.
@@ -75,7 +74,12 @@ func MakeDirectory(path string) error {
 }
 
 // Checks if the path specified is that of a directory.
+// Returns false if the path string is an empty string.
 func PathIsDir(path string) bool {
+	if len(path) == 0 {
+		return false
+	}
+
 	return path[len(path)-1] == '/'
 }
 

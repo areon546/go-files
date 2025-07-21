@@ -1,11 +1,19 @@
 package files
 
 import (
+	"reflect"
 	"strings"
 )
 
 // This will join together the path, filename, and a specified file type.
 func ConstructFilePath(path, filename, filetype string) (filePath string) {
+	if !PathIsDir(path) { // appends a `/` to the path variable
+		if reflect.DeepEqual(path, "") {
+			path = "."
+		}
+		path += "/"
+	}
+
 	filePath = path + filename + "." + filetype
 
 	debugPrint("ConstructFilePath: params: ", path, filename, filetype)

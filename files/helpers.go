@@ -43,14 +43,21 @@ func trimFiletype(filename, filetype string) string {
 
 func filenameContains(filename, filetype string) bool {
 	filenameComponents := strings.Split(filename, ".")
-	if reflect.DeepEqual(filenameComponents[len(filenameComponents)-1], filetype) {
-		// filename type is filetype specified
-		return true
-	}
+	fileTypeInFileName := filenameComponents[len(filenameComponents)-1]
 
-	return false
+	return reflect.DeepEqual(fileTypeInFileName, filetype)
 }
 
 func removeFiletype(filename, filetype string) string {
-	return strings.TrimRight(filename, ("." + filetype))
+	return strings.TrimSuffix(filename, ("." + filetype))
+}
+
+func returnErr(err error) error {
+	if err != nil {
+		errIsEmpty := err == errEmpty
+		if !errIsEmpty {
+			return err
+		}
+	}
+	return nil
 }
