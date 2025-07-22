@@ -35,7 +35,12 @@ type CSVFile struct {
 
 func NewCSVFile(filename string, headings bool) *CSVFile {
 	filename = trimFiletype(filename, "csv")
-	file := NewTextFile(ConstructFilePath("", filename, "csv"))
+	hasCSVSuff := strings.HasSuffix(filename, ".csv")
+	filePath := filename
+	if !hasCSVSuff {
+		filePath += ".csv"
+	}
+	file := NewTextFile(filePath)
 
 	return &CSVFile{file: *file, hasHeaders: headings, contents: [][]string{}}
 }
@@ -85,11 +90,13 @@ func (csv *CSVFile) HasHeaders() bool {
 
 func (csv *CSVFile) Headers() ([]string, error) {
 	emptyHeaders := []string{}
+
+	print(len(csv.contents))
 	if csv.hasHeaders && len(csv.contents) > 0 {
 		return csv.contents[0], nil
 	}
 
-	return emptyHeaders, nil
+	return emptyHeaders, ErrMissingHeaders
 }
 
 // Reading a CSV file

@@ -56,20 +56,27 @@ func TestReadContents(t *testing.T) {
 func TestHeaders(t *testing.T) {
 	t.Run("Expect to have headers", func(t *testing.T) {
 		csv := headersCSV
+		err := csv.ReadContents()
+
+		helpers.AssertNoError(t, err)
 
 		headers, err := csv.Headers()
 
 		helpers.AssertNoError(t, err)
-		helpers.AssertEqualsObject(t, []string{}, headers)
+		helpers.AssertEqualsObject(t, []string{"skinName", "address", "id"}, headers)
 	})
 	// check for errors:
 	// ErrHeadernotFound
 
 	t.Run("Test Missing Headers", func(t *testing.T) {
 		csv := standardCSV
-		print(csv)
-		_, err := csv.Headers()
+		err := csv.ReadContents()
 
-		helpers.AssertError(t, err, ErrInconsistentFieldNumber)
+		helpers.AssertNoError(t, err)
+
+		headers, err := csv.Headers()
+
+		helpers.AssertError(t, err, ErrMissingHeaders)
+		helpers.AssertEqualsObject(t, []string{}, headers)
 	})
 }
