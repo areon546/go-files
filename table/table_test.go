@@ -1,4 +1,4 @@
-package formatter
+package table
 
 import (
 	"testing"
@@ -27,5 +27,4 @@ func TestNewTable(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
-
 }

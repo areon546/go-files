@@ -1,4 +1,4 @@
-package formatter
+package table
 
 import (
 	"testing"
@@ -6,7 +6,10 @@ import (
 	"github.com/areon546/go-helpers/helpers"
 )
 
-// helper functions
+func handle(err error) {
+	// helpers.Handle(err)
+	helpers.Handle(err)
+}
 
 func print(a ...any) {
 	helpers.Print(a...)

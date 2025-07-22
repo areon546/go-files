@@ -1,4 +1,4 @@
-package formatter
+package table
 
 import (
 	"errors"
@@ -6,11 +6,13 @@ import (
 
 type TableConverter func(t table) string
 
-type Table struct{ table }
-type table struct {
-	headers row
-	rows    []row
-}
+type (
+	Table struct{ table }
+	table struct {
+		headers row
+		rows    []row
+	}
+)
 
 func NewTable(cols, rows int) *Table {
 	return &Table{table{headers: *NewRow(cols), rows: makeRows(rows, cols)}}

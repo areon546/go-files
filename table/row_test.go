@@ -1,4 +1,4 @@
-package formatter
+package table
 
 import "testing"
 
@@ -18,5 +18,4 @@ func TestSet(t *testing.T) {
 
 		handleErrorExcept(t, err, ErrOutOfBounds)
 	})
-
 }

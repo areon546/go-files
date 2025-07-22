@@ -1,4 +1,4 @@
-package formatter
+package table
 
 type row struct {
 	cells  []cell
