@@ -33,22 +33,11 @@ func (r *row) String() string {
 	return format("maxLen: %d, cells: %s", r.maxLen, r.cells)
 }
 
-func makeRows(rowC, length int) []row {
+// Creates [length] rows
+func makeRows(numberRows, rowLength int) []row {
 	rows := make([]row, 0)
-	for range rowC {
-		rows = append(rows, *NewRow(length))
+	for range numberRows {
+		rows = append(rows, *NewRow(rowLength))
 	}
 	return rows
-}
-
-type cell struct {
-	value string
-}
-
-func NewCell(value string) *cell {
-	return &cell{value: value}
-}
-
-func (c cell) String() string {
-	return c.value
 }

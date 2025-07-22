@@ -4,18 +4,14 @@ import (
 	"testing"
 )
 
-var (
-	rows      int   = 1
-	cols      int   = 5
-	headers   row   = setupHeaderRow()
-	rowValues []row = []row{}
-	t         Table = Table{table{headers: headers, rows: rowValues}}
-)
+var tab *Table = testTable()
 
-func setupHeaderRow() row {
-	r := *NewRow(cols)
+func testTable() *Table {
+	rows := 5
+	cols := 5
+	tab := &Table{table: table{headers: *NewRow(cols), rows: makeRows(rows, cols)}}
 
-	return r
+	return tab
 }
 
 func TestNewTable(t *testing.T) {
@@ -27,4 +23,22 @@ func TestNewTable(t *testing.T) {
 }
 
 func TestRows(t *testing.T) {
+}
+
+func TestCols(t *testing.T) {
+}
+
+func TestAddRow(t *testing.T) {
+}
+
+func TestAddCol(t *testing.T) {
+}
+
+func TestGetRow(t *testing.T) {
+}
+
+func TestGetCol(t *testing.T) {
+}
+
+func TestSetHeader(t *testing.T) {
 }
