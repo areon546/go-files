@@ -2,6 +2,8 @@ package table
 
 import (
 	"testing"
+
+	"github.com/areon546/go-helpers/helpers"
 )
 
 var tab *Table = testTable()
@@ -17,9 +19,9 @@ func testTable() *Table {
 func TestNewTable(t *testing.T) {
 	cols, rows := 1, 5
 	want := &Table{table{headers: *NewRow(cols), rows: makeRows(rows, cols)}}
-	get := NewTable(cols, rows)
+	get := NewTable(cols, rows, false)
 
-	assertEqualsObject(t, want, get)
+	helpers.AssertEqualsObject(t, want, get)
 }
 
 func TestRows(t *testing.T) {

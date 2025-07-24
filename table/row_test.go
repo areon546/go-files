@@ -1,13 +1,17 @@
 package table
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/areon546/go-helpers/helpers"
+)
 
 func TestNewRow(t *testing.T) {
 	l := 5
-	want := &row{cells: make([]cell, l), maxLen: l}
+	want := &Row{row{cells: make([]Cell, l), maxLen: l}}
 	get := NewRow(l)
 
-	assertEqualsObject(t, want, get)
+	helpers.AssertEqualsObject(t, want, get)
 }
 
 func TestSet(t *testing.T) {
@@ -16,6 +20,6 @@ func TestSet(t *testing.T) {
 	t.Run("Index out of bounds", func(t *testing.T) {
 		err := r.Set(3, "Alients out of bounds")
 
-		handleErrorExcept(t, err, ErrOutOfBounds)
+		helpers.AssertError(t, err, ErrOutOfBounds)
 	})
 }
