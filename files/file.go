@@ -4,6 +4,8 @@ import (
 	"io"
 	"os"
 	"reflect"
+
+	"github.com/areon546/go-helpers/helpers"
 )
 
 // ~~~~~~~~~~~~~~~~ File
@@ -239,7 +241,9 @@ func (f *File) Contents() []byte {
 
 // Returns the path of the file.
 func (f *File) String() string {
-	return f.Name()
+	size := string(len(helpers.BytesToString(f.Contents())))
+
+	return "Name:" + f.Name() + "Size:" + size
 }
 
 // Returns the full name of the file.
