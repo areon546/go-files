@@ -154,6 +154,11 @@ func TestName(t *testing.T) {
 			path:     "file.txt",
 			expected: "./file.txt",
 		},
+		{
+			desc:     "empty",
+			path:     "",
+			expected: "",
+		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
