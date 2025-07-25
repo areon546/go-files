@@ -58,3 +58,10 @@ func (t *table) SetHeader(index int, newHeader string) (err error) {
 	err = t.headers.Set(index, newHeader)
 	return errors.Join(err, errors.New(": end of headers"))
 }
+
+func (t *table) Headers() Row {
+	if t.hasHeaders {
+		return t.headers
+	}
+	return *NewRow(0)
+}

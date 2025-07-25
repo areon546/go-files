@@ -17,6 +17,10 @@ func NewCell(value string) *Cell {
 	return &Cell{cell{value: value}}
 }
 
-func (c cell) String() string {
+func (c *cell) String() string {
 	return c.value
+}
+
+func (c *cell) Set(new string) {
+	c.value = new
 }

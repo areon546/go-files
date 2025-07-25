@@ -5,24 +5,29 @@ package table
 // If you want a specific cell, you give me the number and I give what is inside of it.
 // If you want to edit a specific cell, give me the value and I will change it for you.
 // - If you want to edit a cell that doesn't exist, I will tell you that it doesn't exist. ErrIndexOutOfBounds
-// You cannot make me longer or shorter.
+// You can make me longer or shorter.
 type (
 	Row struct {
 		row
 	}
 	row struct {
-		cells  []Cell
-		maxLen int
+		cells []Cell
+		size  int
 	}
 )
 
 func NewRow(length int) *Row {
-	return &Row{row{cells: make([]Cell, length), maxLen: length}}
+	return &Row{row{cells: make([]Cell, length), size: length}}
+}
+
+// Default Row, with no extra information.
+func EmptyRow() *Row {
+	return NewRow(0)
 }
 
 // Why does this not return an out of bounds error?
 func (r *row) Set(index int, value string) error {
-	if index < r.maxLen {
+	if index < r.size {
 		r.cells[index] = *NewCell(value)
 		return nil
 	}
@@ -33,16 +38,30 @@ func (r *row) Get(index int) string {
 	return r.cells[index].String()
 }
 
-func (r *row) Lengthen(increase int) {
-	r.maxLen += increase
+func (r *row) Lengthen(increaseBy int) {
+	if increaseBy == 0 {
+		return
+	}
+
+	r.size += increaseBy
+
+	// NOTE: Do not have a increaseBy<0 branch because if the length gets shorter
+	// we don't actually need to adjust the length of the slice, just the datastructure's error lenght.
+	if increaseBy > 0 {
+		r.cells = append(r.cells, make([]Cell, increaseBy)...)
+	}
+}
+
+func (r *row) Cells() []Cell {
+	return r.cells[0:r.size]
 }
 
 func (r *row) Size() int {
-	return len(r.cells)
+	return r.size
 }
 
 func (r *row) String() string {
-	return format("maxLen: %d, cells: %s", r.maxLen, r.cells)
+	return format("size: %d, cells: %s", r.size, r.cells)
 }
 
 // Creates [length] rows

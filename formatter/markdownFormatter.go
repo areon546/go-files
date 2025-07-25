@@ -1,7 +1,8 @@
 package formatter
 
-type markdownFormatter struct {
-}
+import "github.com/areon546/go-files/table"
+
+type markdownFormatter struct{}
 
 func NewMarkdownFormatter() markdownFormatter {
 	return markdownFormatter{}
@@ -25,9 +26,10 @@ func (m markdownFormatter) FormatHeading(tier int, heading string) string {
 	return s + " " + heading
 }
 
-func (m markdownFormatter) FormatTable(t Table, heading bool) string {
+func (m markdownFormatter) FormatTable(t table.Table, heading bool) string {
 	s := ""
 
+	// TODO: Need to create Headers, to be able to fix the formatter implementation, to be able to fix the NovaSkins file writing for asset pages implementation.
 	headers := constructRow(t.headers)
 	headerDecleration := markdownHeaderDeclarationRow(t.headers.Size())
 
@@ -46,7 +48,6 @@ func (m markdownFormatter) FormatTable(t Table, heading bool) string {
 }
 
 func (m markdownFormatter) FormatBold(s string) string {
-
 	return format("**%s**", s)
 }
 
@@ -80,7 +81,6 @@ func constructCell(cell string) string {
 }
 
 func markdownHeaderDeclarationRow(length int) string {
-
 	headerDecleration := NewRow(length)
 
 	for i := range length {

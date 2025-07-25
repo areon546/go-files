@@ -12,9 +12,17 @@ import (
 // If you want to change my string, I will allow you.
 
 // Test the cell.String function returns the correct output
-func TestString(t *testing.T) {
+func TestCellString(t *testing.T) {
 	val := "hello_world"
 	c := NewCell("hello_world")
 
 	helpers.AssertEquals(t, val, c.String())
+}
+
+func TestCellSet(t *testing.T) {
+	newVal := "NEW CELL VALUE"
+	c := NewCell("Initial Value")
+	c.Set(newVal)
+
+	helpers.AssertEquals(t, newVal, c.String())
 }
