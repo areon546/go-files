@@ -23,6 +23,8 @@ type (
 	}
 )
 
+var ErrHeaderMissing error = errors.New("files: table: header missing from table")
+
 func NewTable(cols, rows int, headers bool) *Table {
 	t := table{headers: *NewRow(cols), rows: makeRows(rows, cols), hasHeaders: headers}
 	return &Table{t}
@@ -59,9 +61,9 @@ func (t *table) SetHeader(index int, newHeader string) (err error) {
 	return errors.Join(err, errors.New(": end of headers"))
 }
 
-func (t *table) Headers() Row {
+func (t *table) Headers() (Row, error) {
 	if t.hasHeaders {
-		return t.headers
+		return t.headers, nil
 	}
-	return *NewRow(0)
+	return *EmptyRow(), ErrHeaderMissing
 }

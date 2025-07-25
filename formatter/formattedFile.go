@@ -1,12 +1,15 @@
 package formatter
 
-import fileIO "github.com/areon546/go-files/files"
+import (
+	fileIO "github.com/areon546/go-files/files"
+	"github.com/areon546/go-files/table"
+)
 
 type Formatter interface {
 	FormatLink(displayText, path string) string
 	FormatEmbed(path string) string
 	FormatHeading(tier int, heading string) string
-	FormatTable(t Table, headers bool) string
+	FormatTable(t table.Table, headers bool) string
 	FormatBold(s string) string
 	FormatItalic(s string) string
 }

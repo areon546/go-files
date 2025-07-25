@@ -24,23 +24,30 @@ func TestNewTable(t *testing.T) {
 	helpers.AssertEqualsObject(t, want, get)
 }
 
-func TestRows(t *testing.T) {
-}
-
-func TestCols(t *testing.T) {
-}
-
-func TestAddRow(t *testing.T) {
-}
-
-func TestAddCol(t *testing.T) {
-}
-
-func TestGetRow(t *testing.T) {
-}
-
-func TestGetCol(t *testing.T) {
-}
-
-func TestSetHeader(t *testing.T) {
-}
+// func TestRows(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestCols(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestAddRow(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestAddCol(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestGetRow(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestGetCol(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }
+//
+// func TestSetHeader(t *testing.T) {
+// 	helpers.AssertEquals(t, "", "a")
+// }

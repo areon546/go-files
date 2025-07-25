@@ -8,13 +8,13 @@ import (
 
 func TestNewRow(t *testing.T) {
 	l := 5
-	want := &Row{row{cells: make([]Cell, l), maxLen: l}}
+	want := &Row{row{cells: make([]Cell, l), size: l}}
 	get := NewRow(l)
 
 	helpers.AssertEqualsObject(t, want, get)
 }
 
-func TestSet(t *testing.T) {
+func TestRowSet(t *testing.T) {
 	r := NewRow(3)
 	firstVal := "First Element"
 	secondVal := "Actually, it is the third element"
@@ -40,11 +40,15 @@ func TestSet(t *testing.T) {
 	})
 }
 
-func TestGet(t *testing.T) {
+func TestRowGet(t *testing.T) {
 	// Test Get for a value that has been Set
 	// Test Get for a value that has not been set
+	//
+
+	helpers.AssertEquals(t, "", "a")
 }
 
-func TestSize(t *testing.T) {
+func TestRowSize(t *testing.T) {
 	// Test Size of row
+	helpers.AssertEquals(t, "", "a")
 }
