@@ -19,19 +19,22 @@ func print(a ...any) {
 	helpers.Print(a...)
 }
 
-func printf(s string, a ...any) {
-	helpers.Printf(s, a...)
-}
-
-func search(s string, ss []string) int { return helpers.Search(s, ss) }
-
-func format(s string, a ...any) string { return helpers.Format(s, a...) }
-
-func bytesToString(b []byte) string { return helpers.BytesToString(b) }
-
 // unique ~~~~
 func FilesEqual(a, b File) bool {
 	return reflect.DeepEqual(a, b)
+}
+
+func HasSuffix(file, suffix string) bool {
+	fileSuffix := "." + suffix
+	return strings.HasSuffix(file, fileSuffix)
+}
+
+// Appends the filetype 'filetype' specified to the end of the 'file' string.
+func AddFileType(file, filetype string) string {
+	if HasSuffix(file, filetype) {
+		return file
+	}
+	return file + "." + filetype
 }
 
 func trimFiletype(filename, filetype string) string {

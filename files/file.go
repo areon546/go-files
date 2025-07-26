@@ -239,11 +239,11 @@ func (f *File) Contents() []byte {
 	return f.contentBuffer
 }
 
-// Returns the path of the file.
+// Returns Important information about the file to be able to gather more information when printing.
 func (f *File) String() string {
-	size := string(len(helpers.BytesToString(f.Contents())))
+	size := len(f.Contents())
 
-	return "Name:" + f.Name() + "Size:" + size
+	return "Name:" + f.Name() + "Size:" + helpers.IntegerToString(size)
 }
 
 // Returns the full name of the file.

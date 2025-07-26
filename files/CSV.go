@@ -34,13 +34,8 @@ type CSVFile struct {
 // -
 
 func NewCSVFile(filename string, headings bool) *CSVFile {
-	filename = trimFiletype(filename, "csv")
-	hasCSVSuff := strings.HasSuffix(filename, ".csv")
-	filePath := filename
-	if !hasCSVSuff {
-		filePath += ".csv"
-	}
-	file := NewTextFile(filePath)
+	filename = AddFileType(filename, "csv") // redundant check to see if the file is a CSV file, ensures it is if it isn't already
+	file := NewTextFile(filename)
 
 	return &CSVFile{file: *file, hasHeaders: headings, contents: [][]string{}}
 }
@@ -53,12 +48,18 @@ func ReadCSV(filename string, headings bool) (csv *CSVFile, err error) {
 	return csv, err
 }
 
+// Returns -1 if: No headings, Heading not found
+// Otherwise: Returns the index of the heading.
 func (c *CSVFile) IndexOfCol(header string) (index int) {
-	// for i, heading := range c.headings {
-	// 	if reflect.DeepEqual(heading, header) {
-	// 		index = i
-	// 	}
-	// }
+	if !c.hasHeaders || len(c.contents) == 0 {
+		return -1
+	}
+	headings := c.contents[0]
+	for i, heading := range headings {
+		if reflect.DeepEqual(heading, header) {
+			index = i
+		}
+	}
 
 	return
 }

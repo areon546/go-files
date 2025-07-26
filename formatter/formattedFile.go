@@ -1,7 +1,7 @@
 package formatter
 
 import (
-	fileIO "github.com/areon546/go-files/files"
+	"github.com/areon546/go-files/files"
 	"github.com/areon546/go-files/table"
 )
 
@@ -16,20 +16,22 @@ type Formatter interface {
 
 // ~~~~~~~~~~~~~~~~~~~~ FormattedFile
 type FormattedFile struct {
-	fileIO.TextFile
+	files.TextFile
 	Fmt Formatter
 }
 
 func NewHTMLFile(path, filename, IWANTERRORS string) *FormattedFile {
-	return newFormattedFile(NewMarkdownFormatter(), fileIO.ConstructFilePath(path, filename, "html"))
+	filepath := files.AddFileType(path+filename, "html")
+	return newFormattedFile(NewMarkdownFormatter(), filepath)
 }
 
 func NewMarkdownFile(path, filename, IWantErrorsWrong string) *FormattedFile {
-	return newFormattedFile(NewMarkdownFormatter(), fileIO.ConstructFilePath(path, filename, "md"))
+	filepath := files.AddFileType(path+filename, "md")
+	return newFormattedFile(NewMarkdownFormatter(), filepath)
 }
 
 func newFormattedFile(fmt Formatter, filePath string) *FormattedFile {
-	return &FormattedFile{TextFile: *fileIO.NewTextFile(filePath), Fmt: fmt}
+	return &FormattedFile{TextFile: *files.NewTextFile(filePath), Fmt: fmt}
 }
 
 func (m *FormattedFile) AppendLink(displayText, path string) {
