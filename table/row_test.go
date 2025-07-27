@@ -27,28 +27,59 @@ func TestRowSet(t *testing.T) {
 
 	t.Run("Set Value", func(t *testing.T) {
 		err := r.Set(2, firstVal)
+		helpers.AssertNoError(t, err)
 
-		helpers.AssertEquals(t, r.Get(2), firstVal)
+		val, err := r.Get(2)
+		helpers.AssertEquals(t, val, firstVal)
 		helpers.AssertNoError(t, err)
 	})
 
 	t.Run("Overwrite Value", func(t *testing.T) {
 		err := r.Set(2, secondVal)
+		helpers.AssertNoError(t, err)
 
-		helpers.AssertEquals(t, r.Get(2), secondVal)
+		val, err := r.Get(2)
+		helpers.AssertEquals(t, val, secondVal)
 		helpers.AssertNoError(t, err)
 	})
 }
 
 func TestRowGet(t *testing.T) {
+	r := NewRow(3)
 	// Test Get for a value that has been Set
 	// Test Get for a value that has not been set
 	//
 
-	helpers.AssertEquals(t, "", "a")
+	t.Run("Row value not yet set", func(t *testing.T) {
+		val, err := r.Get(0)
+		helpers.AssertEquals(t, val, "")
+		helpers.AssertNoError(t, err)
+	})
+
+	t.Run("Row value now set", func(t *testing.T) {
+		err := r.Set(0, "ABC")
+		helpers.AssertNoError(t, err)
+
+		val, err := r.Get(0)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, val, "ABC")
+	})
 }
 
 func TestRowSize(t *testing.T) {
-	// Test Size of row
-	helpers.AssertEquals(t, "", "a")
+	r := NewRow(3)
+	// Test Size of row can only be adjusted by (1) method
+	t.Run("Size correlates to preset value", func(t *testing.T) {
+		helpers.AssertEqualsInt(t, 3, r.Size())
+	})
+	// Test access to values based on make lenght
+	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
+		err := r.Set(2, "asd")
+		r.Lengthen(-1)
+
+		s, err := r.Get(2)
+
+		helpers.AssertNoError(t, err) // NOTE: Do we allow array indexing?
+		helpers.AssertEquals(t, "", s)
+	})
 }

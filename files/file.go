@@ -250,7 +250,7 @@ func (f *File) String() string {
 // The path + the file name.
 func (f *File) Name() string {
 	if f.filename == "" {
-		return "" // TODO: Problem here, if a filename is empty, this returns ./. usually, bad. How should I fix it?
+		return ""
 	}
 	return f.Path() + f.filename + "." + f.suffix
 }

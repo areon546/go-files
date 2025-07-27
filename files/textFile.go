@@ -8,6 +8,8 @@ import (
 	"github.com/areon546/go-helpers/helpers"
 )
 
+// Contract:
+//   - you can use me to write to files.
 type TextFile struct {
 	File
 	textBuffer []string

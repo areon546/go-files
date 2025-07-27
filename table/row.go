@@ -6,6 +6,7 @@ package table
 // If you want to edit a specific cell, give me the value and I will change it for you.
 // - If you want to edit a cell that doesn't exist, I will tell you that it doesn't exist. ErrIndexOutOfBounds
 // You can make me longer or shorter.
+// Be familiar, use index notation where possible.
 type (
 	Row struct {
 		row
@@ -34,8 +35,8 @@ func (r *row) Set(index int, value string) error {
 	return ErrEndOfRow
 }
 
-func (r *row) Get(index int) string {
-	return r.cells[index].String()
+func (r *row) Get(index int) (string, error) {
+	return r.cells[index].String(), nil
 }
 
 func (r *row) Lengthen(increaseBy int) {
@@ -44,11 +45,18 @@ func (r *row) Lengthen(increaseBy int) {
 	}
 
 	r.size += increaseBy
+	// NOTE: If Lengthen(-2) shortens it, but then you lengthen it again, the values haven't been reset yet.
 
 	// NOTE: Do not have a increaseBy<0 branch because if the length gets shorter
 	// we don't actually need to adjust the length of the slice, just the datastructure's error lenght.
-	if increaseBy > 0 {
-		r.cells = append(r.cells, make([]Cell, increaseBy)...)
+	lengthToIncrease := len(r.cells) - increaseBy
+	if increaseBy > 0 && lengthToIncrease > 0 {
+		r.cells = append(r.cells, make([]Cell, lengthToIncrease)...)
+	} else if increaseBy < 0 {
+		// loop backwards and remove values
+		for indexesToRemove := 0; indexesToRemove < len(r.cells); indexesToRemove++ {
+			print(indexesToRemove)
+		}
 	}
 }
 
