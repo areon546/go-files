@@ -79,7 +79,40 @@ func TestRowSize(t *testing.T) {
 
 		r.Lengthen(-1)
 		s, err := r.Get(2)
-		helpers.AssertError(t, err, ErrOutOfBounds) // NOTE: Do we allow array indexing?
+		helpers.AssertError(t, err, ErrOutOfBounds)
 		helpers.AssertEquals(t, "", s)
+
+		r.Lengthen(1)
+		s, err = r.Get(2)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, "", s)
+	})
+}
+
+// Test that you get the row back
+// test thta when you shorten it, you get the appropriate elements regardless
+func TestRowCells(t *testing.T) {
+	r := NewRow(5)
+
+	r.Set(0, "0")
+	r.Set(1, "1")
+	r.Set(2, "2")
+	r.Set(3, "3")
+	r.Set(4, "4")
+
+	t.Run("Get Access to Row object", func(t *testing.T) {
+		row := r.Cells()
+		eRow := []Cell{*NewCell("0"), *NewCell("1"), *NewCell("2"), *NewCell("3"), *NewCell("4")}
+
+		helpers.AssertEqualsObject(t, eRow, row)
+	})
+
+	t.Run("Shorter = cannot access last few values. ", func(t *testing.T) {
+		r.Lengthen(-2)
+
+		row := r.Cells()
+		eRow := []Cell{*NewCell("0"), *NewCell("1"), *NewCell("2")}
+
+		helpers.AssertEqualsObject(t, eRow, row)
 	})
 }

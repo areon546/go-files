@@ -55,6 +55,14 @@ func (r *row) Lengthen(increaseBy int) {
 	if increaseBy > 0 && lengthToIncrease > 0 {
 		r.cells = append(r.cells, make([]Cell, lengthToIncrease)...)
 	}
+
+	// Need to reset values at tail of row if shortening.
+	// It doesn't make sense if when we shorten the row, it will keep values at the tail of the slice.
+	if increaseBy < 0 {
+		for indexToReset := len(r.cells) + increaseBy; indexToReset < len(r.cells); indexToReset++ {
+			r.cells[indexToReset].Set("")
+		}
+	}
 }
 
 func (r *row) Cells() []Cell {
