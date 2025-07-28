@@ -32,11 +32,14 @@ func (r *row) Set(index int, value string) error {
 		r.cells[index] = *NewCell(value)
 		return nil
 	}
-	return ErrEndOfRow
+	return ErrOutOfBounds
 }
 
 func (r *row) Get(index int) (string, error) {
-	return r.cells[index].String(), nil
+	if index < r.size {
+		return r.cells[index].String(), nil
+	}
+	return "", ErrOutOfBounds // Standard result if index is out of bounds
 }
 
 func (r *row) Lengthen(increaseBy int) {
@@ -45,18 +48,12 @@ func (r *row) Lengthen(increaseBy int) {
 	}
 
 	r.size += increaseBy
-	// NOTE: If Lengthen(-2) shortens it, but then you lengthen it again, the values haven't been reset yet.
 
 	// NOTE: Do not have a increaseBy<0 branch because if the length gets shorter
 	// we don't actually need to adjust the length of the slice, just the datastructure's error lenght.
 	lengthToIncrease := len(r.cells) - increaseBy
 	if increaseBy > 0 && lengthToIncrease > 0 {
 		r.cells = append(r.cells, make([]Cell, lengthToIncrease)...)
-	} else if increaseBy < 0 {
-		// loop backwards and remove values
-		for indexesToRemove := 0; indexesToRemove < len(r.cells); indexesToRemove++ {
-			print(indexesToRemove)
-		}
 	}
 }
 

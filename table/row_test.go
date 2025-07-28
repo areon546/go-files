@@ -75,11 +75,11 @@ func TestRowSize(t *testing.T) {
 	// Test access to values based on make lenght
 	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
 		err := r.Set(2, "asd")
+		helpers.AssertNoError(t, err)
+
 		r.Lengthen(-1)
-
 		s, err := r.Get(2)
-
-		helpers.AssertNoError(t, err) // NOTE: Do we allow array indexing?
+		helpers.AssertError(t, err, ErrOutOfBounds) // NOTE: Do we allow array indexing?
 		helpers.AssertEquals(t, "", s)
 	})
 }
