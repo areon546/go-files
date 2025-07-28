@@ -66,13 +66,12 @@ func TestRowGet(t *testing.T) {
 	})
 }
 
-func TestRowSize(t *testing.T) {
+func TestRowLengthen(t *testing.T) {
+	// test increasing length
+	// test shortening length
+	//
 	r := NewRow(3)
-	// Test Size of row can only be adjusted by (1) method
-	t.Run("Size correlates to preset value", func(t *testing.T) {
-		helpers.AssertEqualsInt(t, 3, r.Size())
-	})
-	// Test access to values based on make lenght
+
 	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
 		err := r.Set(2, "asd")
 		helpers.AssertNoError(t, err)
@@ -115,4 +114,21 @@ func TestRowCells(t *testing.T) {
 
 		helpers.AssertEqualsObject(t, eRow, row)
 	})
+}
+
+func TestRowSize(t *testing.T) {
+	r := NewRow(3)
+	// Test Size of row can only be adjusted by (1) method
+	t.Run("Size correlates to preset value", func(t *testing.T) {
+		helpers.AssertEqualsInt(t, 3, r.Size())
+	})
+	// Test access to values based on make lenght
+	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
+		r.Lengthen(-1)
+		helpers.AssertEqualsInt(t, 2, r.Size())
+	})
+}
+
+func TestRowString(t *testing.T) {
+	// TODO: unsure what to have a an ideal string representation of a row
 }
