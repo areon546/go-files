@@ -1,5 +1,7 @@
 package table
 
+import "reflect"
+
 // Contract:
 // I contain a string.
 // If you give me a string, I will then give it back to you.
@@ -21,6 +23,17 @@ func (c *cell) String() string {
 	return c.value
 }
 
-func (c *cell) Set(new string) {
+func (c *cell) Set(new string) error {
+	cellHadValue := !c.IsEmpty()
 	c.value = new
+
+	if cellHadValue {
+		return ErrCellPopulated
+	}
+	return nil
+}
+
+// Returns whether the Cell contains "" or not.
+func (c *cell) IsEmpty() bool {
+	return reflect.DeepEqual(c.value, "")
 }

@@ -26,11 +26,9 @@ func EmptyRow() *Row {
 	return NewRow(0)
 }
 
-// Why does this not return an out of bounds error?
 func (r *row) Set(index int, value string) error {
 	if index < r.size {
-		r.cells[index] = *NewCell(value)
-		return nil
+		return r.cells[index].Set(value)
 	}
 	return ErrOutOfBounds
 }

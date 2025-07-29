@@ -36,7 +36,7 @@ func TestRowSet(t *testing.T) {
 
 	t.Run("Overwrite Value", func(t *testing.T) {
 		err := r.Set(2, secondVal)
-		helpers.AssertNoError(t, err)
+		helpers.AssertError(t, err, ErrCellPopulated)
 
 		val, err := r.Get(2)
 		helpers.AssertEquals(t, val, secondVal)
@@ -67,16 +67,24 @@ func TestRowGet(t *testing.T) {
 }
 
 func TestRowLengthen(t *testing.T) {
-	// test increasing length
-	// test shortening length
-	//
-	r := NewRow(3)
+	t.Run("If you make it longer, new cells are set to \"\"", func(t *testing.T) {
+		r := NewRow(3)
+		r.Lengthen(1)
+		helpers.AssertEqualsInt(t, 4, r.Size())
+
+		s, err := r.Get(3)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, "", s)
+	})
 
 	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
+		r := NewRow(3)
 		err := r.Set(2, "asd")
 		helpers.AssertNoError(t, err)
 
 		r.Lengthen(-1)
+		helpers.AssertEqualsInt(t, 2, r.Size())
+
 		s, err := r.Get(2)
 		helpers.AssertError(t, err, ErrOutOfBounds)
 		helpers.AssertEquals(t, "", s)
@@ -123,7 +131,7 @@ func TestRowSize(t *testing.T) {
 		helpers.AssertEqualsInt(t, 3, r.Size())
 	})
 	// Test access to values based on make lenght
-	t.Run("If you make it shorter, you cannot access the originally last couple values", func(t *testing.T) {
+	t.Run("If you change size, it is reflected", func(t *testing.T) {
 		r.Lengthen(-1)
 		helpers.AssertEqualsInt(t, 2, r.Size())
 	})
