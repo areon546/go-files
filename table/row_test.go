@@ -94,6 +94,18 @@ func TestRowLengthen(t *testing.T) {
 		helpers.AssertNoError(t, err)
 		helpers.AssertEquals(t, "", s)
 	})
+
+	t.Run("At length 0, you can make it longer", func(t *testing.T) {
+		r := NewRow(0)
+		helpers.AssertEqualsInt(t, 0, r.Size())
+
+		r.Lengthen(1)
+		helpers.AssertEqualsInt(t, 1, r.Size())
+
+		val, err := r.Get(0)
+		helpers.AssertEquals(t, "", val)
+		helpers.AssertNoError(t, err)
+	})
 }
 
 // Test that you get the row back

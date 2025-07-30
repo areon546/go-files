@@ -1,5 +1,7 @@
 package table
 
+import "github.com/areon546/go-helpers/helpers"
+
 type TableConverter func(t table) string
 
 // Contract:
@@ -8,6 +10,7 @@ type TableConverter func(t table) string
 // I can give you the value at any specific cell, if you give my it's location.
 // I can assign headers to specified columns.
 // - I will tell you if there are still columns without headers.
+// If you want to adjust my size, you have to give me values to populate the remaining elements.
 type (
 	Table struct{ table }
 	table struct {
@@ -24,8 +27,8 @@ type (
 
 // Creates a new table with the specified number of columns and rows.
 // NOTE: rows refers to the number of entries in the table, and excludes the Header row.
-func NewTable(cols, rows int) *Table {
-	t := table{records: makeRows(rows, cols), headers: *NewRow(cols), headersEdited: true}
+func NewTable(cols int) *Table {
+	t := table{records: makeRows(0, cols), headers: *NewRow(cols), headersEdited: true}
 	return &Table{t}
 }
 
@@ -34,7 +37,10 @@ func (t *table) HasHeaders() bool {
 	if t.headersEdited {
 		// recalculate hasHeaders
 		missing := t.MissingHeaders()
-		t.hasHeaders = len(missing) == 0
+		noMissingElements := len(missing) == 0
+		atLeastOneCol := t.Cols() != 0
+
+		t.hasHeaders = noMissingElements && atLeastOneCol
 		t.headersEdited = false
 	}
 
@@ -63,7 +69,7 @@ func (t *table) Entries() int {
 
 // Returns the number of columns the table has.
 func (t *table) Cols() int {
-	return t.headers.size
+	return t.headers.Size()
 }
 
 // Getters
@@ -73,7 +79,8 @@ func (t *table) Records() []Row {
 	return t.records
 }
 
-// Returns the Header Row
+// Returns the Header Row.
+// NOTE: If there isn't a header in the table, it will return an empty row of length zero, and ErrHeaderMissing
 func (t *table) Headers() (Row, error) {
 	if t.HasHeaders() {
 		return t.headers, nil
@@ -85,10 +92,10 @@ func (t *table) Headers() (Row, error) {
 
 // Returns the specified Row across the records
 func (t *table) Record(i int) (Row, error) {
-	if i < 0 || i > len(t.records) {
-		return *NewRow(0), ErrOutOfBounds
+	if indexWithinBounds(i, t.Entries()) {
+		return t.records[i], nil
 	}
-	return t.records[i], nil
+	return *NewRow(0), ErrOutOfBounds
 }
 
 // Returns the specified column in the table.
@@ -98,6 +105,10 @@ func (t *table) Col(i int) (string, Row, error) {
 
 // Returns the Header of the specified column
 func (t *table) Header(i int) (Cell, error) {
+	if t.HasHeaders() {
+		return t.headers.cells[i], nil
+	}
+
 	return *NewCell(""), nil
 }
 
@@ -110,14 +121,33 @@ func (t *table) AddRecord(r Row) {
 
 // Adds a column to the table.
 // Set the header parameter to "" to leave it empty.
-func (t *table) AddCol(header string) {
-	for _, row := range t.records {
+func (t *table) AddCol(header string, colValues Row) error {
+	// check if values.Size == table.Size,
+	numRows := t.Cols()
+	inputColumnSize := colValues.Size()
+
+	tableHasASize := t.Cols() > 0
+	incompatibleColumnSize := numRows != inputColumnSize
+	if tableHasASize && incompatibleColumnSize {
+		return ErrIncompatibleSize
+	}
+
+	// No error, thus want to actually add columns.
+	for recordIndex, row := range t.records {
 		row.Lengthen(1)
+
+		colEntry, err := colValues.Get(recordIndex)
+		helpers.Handle(err)
+		err = row.Set(row.Size()-1, colEntry)
+		helpers.Handle(err)
 	}
 
 	// Assign header
+	lastIndex := t.headers.Size()
 	t.headers.Lengthen(1)
-	t.headers.Set(t.headers.size-1, header)
+	t.headers.Set(lastIndex, header)
+
+	return nil
 }
 
 // Sets the value of a Header based on the specified column index.

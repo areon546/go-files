@@ -26,15 +26,16 @@ func EmptyRow() *Row {
 	return NewRow(0)
 }
 
+// Returns ErrOutOfBounds if index is too big or small.
 func (r *row) Set(index int, value string) error {
-	if index < r.size {
+	if indexWithinBounds(index, r.size) {
 		return r.cells[index].Set(value)
 	}
 	return ErrOutOfBounds
 }
 
 func (r *row) Get(index int) (string, error) {
-	if index < r.size {
+	if indexWithinBounds(index, r.size) {
 		return r.cells[index].String(), nil
 	}
 	return "", ErrOutOfBounds // Standard result if index is out of bounds
@@ -47,11 +48,17 @@ func (r *row) Lengthen(increaseBy int) {
 
 	r.size += increaseBy
 
-	// NOTE: Do not have a increaseBy<0 branch because if the length gets shorter
-	// we don't actually need to adjust the length of the slice, just the datastructure's error lenght.
-	lengthToIncrease := len(r.cells) - increaseBy
-	if increaseBy > 0 && lengthToIncrease > 0 {
-		r.cells = append(r.cells, make([]Cell, lengthToIncrease)...)
+	needToAddElements := r.size > len(r.cells)
+	if needToAddElements {
+		elementsToAdd := r.size - len(r.cells)
+
+		if elementsToAdd > 0 {
+			// add to length of r.cells
+			r.cells = append(r.cells, make([]Cell, elementsToAdd)...)
+		} else if elementsToAdd <= 0 {
+			// NOTE: elementsToAdd should never be zero nor lower
+			panic("elementsToAdd is 0 or lower")
+		}
 	}
 
 	// Need to reset values at tail of row if shortening.
