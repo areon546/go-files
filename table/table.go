@@ -73,7 +73,7 @@ func (t *table) HasHeaders() bool {
 		// recalculate hasHeaders
 		missing := t.MissingHeaders()
 		noMissingElements := len(missing) == 0
-		atLeastOneCol := t.Cols() != 0
+		atLeastOneCol := t.Width() != 0
 
 		t.hasHeaders = noMissingElements && atLeastOneCol
 		t.headersEdited = false
@@ -103,13 +103,8 @@ func (t *table) Entries() int {
 }
 
 // Returns the number of columns the table has.
-func (t *table) Cols() int {
-	return t.headers.Size()
-}
-
-// Returns the width of the table, ie the number of columns.
 func (t *table) Width() int {
-	return t.Cols()
+	return t.headers.Size()
 }
 
 // Returns whether the given Record is compatible with the instance of the table due to length, or not.
@@ -144,8 +139,8 @@ func (t *table) Record(i int) (Row, error) {
 }
 
 // Returns the specified column in the table.
-func (t *table) Col(i int) (string, Row, error) {
-	return "", *EmptyRow(), nil
+func (t *table) Col(i int) (header string, colVals Row, err error) {
+	return "", *EmptyRow(), nil // TODO:
 }
 
 // Returns the Header of the specified column
@@ -157,7 +152,7 @@ func (t *table) Header(i int) (Cell, error) {
 	return *NewCell(""), nil
 }
 
-// Setters
+// Adders
 
 // Appends a Row to the Records
 func (t *table) AddRecord(r Row) error {
@@ -166,45 +161,6 @@ func (t *table) AddRecord(r Row) error {
 	}
 	t.records = append(t.records, r)
 	return nil
-}
-
-// Adds a column to the table.
-// Set the header parameter to "" to leave it empty.
-func (t *table) AddCol(header string, colValues Row) error {
-	// check if values.Size == table.Size,
-	numRows := t.Cols()
-	inputColumnSize := colValues.Size()
-
-	tableHasASize := t.Cols() > 0
-	incompatibleColumnSize := numRows != inputColumnSize
-	if tableHasASize && incompatibleColumnSize {
-		return ErrIncompatibleSize
-	}
-
-	// No error, thus want to actually add columns.
-	for recordIndex, row := range t.records {
-		row.Lengthen(1)
-
-		colEntry, err := colValues.Get(recordIndex)
-		helpers.Handle(err)
-		err = row.Set(row.Size()-1, colEntry)
-		helpers.Handle(err)
-	}
-
-	// Assign header
-	lastIndex := t.headers.Size()
-	t.headers.Lengthen(1)
-	t.headers.Set(lastIndex, header)
-
-	return nil
-}
-
-func (t *table) Widen(l int) {
-	t.headers.Lengthen(l)
-
-	for _, row := range t.Iter() {
-		row.Lengthen(l)
-	}
 }
 
 // Adds all the specified records, one by one.
@@ -221,12 +177,51 @@ func (t *table) AddRecords(records []Row) error {
 
 	}
 
-	for _, record := range compatibleRows {
-		t.AddRecord(record)
+	t.records = append(t.records, compatibleRows...)
+	return nil
+}
+
+// Increases the width of the entire table by 1.
+// Another way to add columns, however without needing to prepopulate them with values.
+func (t *table) Widen(l int) {
+	t.headers.Lengthen(l)
+
+	for _, row := range t.Iter() {
+		row.Lengthen(l)
+	}
+}
+
+// Adds a column to the table.
+// Set the header parameter to "" to leave it empty.
+func (t *table) AddCol(header string, colValues Row) error {
+	// check if values.Size == table.Size,
+	numRows := t.Entries()
+	inputColumnSize := colValues.Size()
+
+	tableHasASize := t.Width() > 0
+	incompatibleColumnSize := numRows != inputColumnSize
+	if tableHasASize && incompatibleColumnSize {
+		return ErrIncompatibleSize
+	}
+
+	lastIndex := t.headers.Size()
+	t.Widen(1)
+
+	// Assign header
+	_ = t.headers.Set(lastIndex, header) // Ignoring error because guaranteed to not fail.
+
+	// No error, thus want to actually add columns.
+	for recordIndex, row := range t.records {
+		colEntry, err := colValues.Get(recordIndex)
+		helpers.Handle(err)
+		err = row.Set(row.Size()-1, colEntry)
+		helpers.Handle(err)
 	}
 
 	return nil
 }
+
+// Setters
 
 func (t *table) SetHeaders(headers Row) error {
 	if !t.IsCompatible(headers) {

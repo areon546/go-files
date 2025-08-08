@@ -9,17 +9,18 @@ import (
 )
 
 var (
-	ErrInconsistentFieldNumber error = errors.New("csv: Number of fields in CSV is inconsistent")
-	errMissingHeaders          error = errors.New("headings are missing")
-	ErrMissingHeaders          error = helpers.WrapError("%w %w", errFiles, errMissingHeaders)
+	errMissingHeaders error = errors.New("headings are missing")
+	ErrMissingHeaders error = helpers.WrapError("%w %w", errFiles, errMissingHeaders)
 )
 
 // ~~~~~~~~~~~~~~~~~~~~ CSVFile
+
+// NOTE: This struct has the same format as TextFile and File.
+// Convenient usage is: ReadContents() and WriteContents()
 type CSVFile struct {
-	// TODO: ? convert to table datastructure
-	file        *TextFile
-	table       *table.Table
-	hasHeadings bool
+	*table.Table           // I want all Table methods to be available.
+	file         *TextFile // I want to control access to file methods.
+	hasHeadings  bool
 }
 
 // I would like if this fulfilled the RFC 4180 specs, however allowing multi line CSVs isn't a necessary feature for me currently.
@@ -35,7 +36,7 @@ func NewCSVFile(filename string, headings bool) *CSVFile {
 
 	table := table.NewTable(0)
 
-	return &CSVFile{file: file, table: table, hasHeadings: headings}
+	return &CSVFile{Table: table, file: file, hasHeadings: headings}
 }
 
 // returns an array of headings and a 2d array of
@@ -47,7 +48,7 @@ func ReadCSV(filename string, headings bool) (csv *CSVFile, err error) {
 }
 
 func (csv *CSVFile) String() string {
-	return helpers.Format("File: %s\nHasHeadings: %t\nTable: \n%v\n", csv.file.Name(), csv.hasHeadings, csv.table)
+	return helpers.Format("File: %s\nHasHeadings: %t\nTable: \n%v\n", csv.file.Name(), csv.hasHeadings, csv.Table)
 }
 
 // Reading a CSV file
@@ -56,20 +57,23 @@ func (csv *CSVFile) ReadContents() (err error) {
 	// Assumes the file attribute has been populated.
 	fileContents := csv.file.ReadFile()
 
-	csv.table, err = csv.deserialise(fileContents)
+	csv.Table, err = csv.deserialise(fileContents)
 	return err
 }
 
 // Converts a []string that is supposed to represent a CSV file's lines, to a table
 func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 	t := table.EmptyTable()
+	err := errors.New("files/csv: Error occured while deserialising the given string array")
+	var retErr error = nil
+	errAdded := false
 
 	// go through each row in contents
 	// convert it to Row objects
 	// add said Row objects to the table
 	// return the table
 	firstLine := true
-	for _, content := range contents {
+	for line, content := range contents {
 		// for each line:
 		row := csvRecordToRow(content)
 
@@ -78,10 +82,7 @@ func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 			t.Widen(row.Size())
 
 			if csv.hasHeadings {
-				err := t.SetHeaders(*row)
-				if err != nil {
-					panic(err)
-				}
+				_ = t.SetHeaders(*row) // Error should not appear since the table has been widened to have the same size as the header row
 				continue
 			}
 
@@ -90,15 +91,27 @@ func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 		// TODO: To make compatible with RFC 4180, instead I could repeatedly cut a preffix using strings.Index(content, ",") and some more fancy logic
 
 		// Add Record to table.
-		err := t.AddRecord(*row)
-		if err != nil {
-			if errors.Is(err, table.ErrIncompatibleSize) {
-				// TODO: Add to Error return to have a list of all errors returned.
+		recErr := t.AddRecord(*row)
+		if recErr != nil {
+			if errors.Is(recErr, table.ErrIncompatibleSize) {
+				// Convert to
+				recErr = addErrInconsistentFieldNumber(line)
+			}
+
+			// Create new error, ErrInconsistentFieldNumber, reference the line number,
+			lastLine := line == len(contents)-1
+
+			if !lastLine {
+				err = errors.Join(err, recErr)
+				errAdded = true
 			}
 		}
 	}
 
-	return t, nil
+	if errAdded {
+		retErr = err
+	}
+	return t, retErr
 }
 
 func csvRecordToRow(csvRecord string) *table.Row {
@@ -113,7 +126,7 @@ func csvRecordToRow(csvRecord string) *table.Row {
 }
 
 func (c *CSVFile) WriteContents() {
-	contents, _ := c.serialise(c.table) // TODO: handle this error
+	contents, _ := c.serialise(c.Table) // TODO: handle this error
 
 	c.file.ClearFile()
 	c.file.AppendLines(contents, true)
@@ -132,7 +145,7 @@ func (csv *CSVFile) serialise(table *table.Table) (contents []string, err error)
 }
 
 func (c *CSVFile) Contents() []string {
-	contents, _ := c.serialise(c.table)
+	contents, _ := c.serialise(c.Table)
 
 	return contents
 }

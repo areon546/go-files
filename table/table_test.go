@@ -117,10 +117,10 @@ func TestMissingHeaders(t *testing.T) {
 
 //
 
-// TestCols
-func TestCols(t *testing.T) {
+// Width
+func TestWidth(t *testing.T) {
 	tab := globalTable
-	helpers.AssertEqualsInt(t, 5, tab.Cols())
+	helpers.AssertEqualsInt(t, 5, tab.Width())
 }
 
 func TestEntries(t *testing.T) {
@@ -128,12 +128,11 @@ func TestEntries(t *testing.T) {
 	helpers.AssertEqualsInt(t, 5, tab.Entries())
 }
 
-func TestWidth(t *testing.T) {
-	// TODO:
-}
-
 func TestIsCompatible(t *testing.T) {
-	// TODO:
+	tab := emptyTable
+	record := NewRow(5)
+
+	helpers.AssertEqualsBool(t, true, tab.IsCompatible(*record))
 }
 
 func TestWiden(t *testing.T) {
@@ -144,7 +143,7 @@ func TestWiden(t *testing.T) {
 // TestRecords
 func TestRecords(t *testing.T) {
 	tab := globalTable
-	rowLen := tab.Cols()
+	rowLen := tab.Width()
 
 	helpers.AssertEqualsInt(t, 5, rowLen)
 	helpers.AssertEqualsObject(t, recordsToAdd, tab.Records())
@@ -241,7 +240,7 @@ func TestAddRecords(t *testing.T) {
 // AddCol
 func TestAddCol(t *testing.T) {
 	tab := NewTable(0)
-	helpers.AssertEqualsInt(t, 0, tab.Cols())
+	helpers.AssertEqualsInt(t, 0, tab.Width())
 
 	row := NewRow(5)
 	err := tab.AddCol("ID", *row)

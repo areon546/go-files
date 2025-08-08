@@ -30,9 +30,8 @@ func TestReadContents(t *testing.T) {
 		err := csv.ReadContents()
 		helpers.AssertNoError(t, err)
 
-		helpers.Print("Width", csv.table.Width())
-		helpers.Print(csv)
-		helpers.AssertEqualsInt(t, 2, csv.table.Entries())
+		helpers.AssertEqualsInt(t, 2, csv.Entries())
+		helpers.AssertEqualsInt(t, 4, csv.Width())
 	})
 
 	t.Run("Headers", func(t *testing.T) {
@@ -40,6 +39,14 @@ func TestReadContents(t *testing.T) {
 		err := csv.ReadContents()
 
 		helpers.AssertNoError(t, err)
+
+		head, err := csv.Headers()
+		helpers.AssertNoError(t, err)
+		helpers.AssertEqualsInt(t, 3, head.Size())
+
+		header1, err := head.Get(0)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, "skinName", header1)
 	})
 
 	t.Run("ErrInconsistentFieldNumber Expected", func(t *testing.T) {
