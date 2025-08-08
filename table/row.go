@@ -36,6 +36,7 @@ func (r *row) Set(index int, value string) error {
 	return ErrOutOfBounds
 }
 
+// Returns ErrOutOfBounds if given index is larger than the size of the Row.
 func (r *row) Get(index int) (string, error) {
 	if indexWithinBounds(index, r.size) {
 		return r.cells[index].String(), nil

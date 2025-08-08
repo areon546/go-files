@@ -28,7 +28,7 @@ func testTable() Table {
 	tab.SetHeader(4, "Speed")
 
 	for _, record := range recordsToAdd {
-		tab.AddRecord(record)
+		tab.AddRecord(&record)
 	}
 	return *tab
 }
@@ -132,7 +132,7 @@ func TestIsCompatible(t *testing.T) {
 	tab := emptyTable
 	record := NewRow(5)
 
-	helpers.AssertEqualsBool(t, true, tab.IsCompatible(*record))
+	helpers.AssertEqualsBool(t, true, tab.IsCompatible(record))
 }
 
 func TestWiden(t *testing.T) {
@@ -179,6 +179,44 @@ func TestRecord(t *testing.T) {
 	})
 }
 
+// IndexOf ()
+func TestIndexOf(t *testing.T) {
+	tab := globalTable
+
+	t.Run("Valid header", func(t *testing.T) {
+		header := "Horse ID"
+		headerI := 0
+		index := tab.IndexOf(header)
+
+		helpers.AssertEqualsInt(t, headerI, index)
+
+		headerVal, err := tab.Header(index)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, header, headerVal)
+	})
+	t.Run("Invalid header", func(t *testing.T) {
+		index := tab.IndexOf("")
+		helpers.AssertEqualsInt(t, -1, index)
+	})
+}
+
+// Cell
+func TestCell(t *testing.T) {
+	tab := globalTable
+
+	t.Run("Valid index", func(t *testing.T) {
+		val, err := tab.Cell(0, 0)
+		helpers.AssertNoError(t, err)
+		helpers.AssertEquals(t, "0", val)
+	})
+
+	t.Run("Invalid index", func(t *testing.T) {
+		val, err := tab.Cell(-1, -1)
+		helpers.AssertError(t, err, ErrOutOfBounds)
+		helpers.AssertEquals(t, "", val)
+	})
+}
+
 // TestCol
 func TestCol(t *testing.T) {
 	t.Run("accessing within bounds", func(t *testing.T) {
@@ -218,7 +256,7 @@ func TestAddRecord(t *testing.T) {
 	_, err = row0.Get(0)
 	helpers.AssertError(t, err, ErrOutOfBounds)
 
-	tab.AddRecord(*record)
+	tab.AddRecord(record)
 	helpers.AssertEqualsInt(t, 1, tab.Entries())
 
 	// No ErrOutOfBounds after population
@@ -258,7 +296,7 @@ func TestSetHeader(t *testing.T) {
 
 		hd, err := tab.Header(0)
 		helpers.AssertNoError(t, err)
-		helpers.AssertEquals(t, "", hd.String())
+		helpers.AssertEquals(t, "", hd)
 	})
 
 	t.Run("Headers in table", func(t *testing.T) {
@@ -266,7 +304,7 @@ func TestSetHeader(t *testing.T) {
 
 		hd, err := tab.Header(0)
 		helpers.AssertNoError(t, err)
-		helpers.AssertEquals(t, "Horse ID", hd.String())
+		helpers.AssertEquals(t, "Horse ID", hd)
 	})
 }
 

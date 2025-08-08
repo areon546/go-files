@@ -2,6 +2,7 @@ package table
 
 import (
 	"iter"
+	"reflect"
 
 	"github.com/areon546/go-helpers/helpers"
 )
@@ -36,7 +37,7 @@ func NewTable(cols int) *Table {
 	return &Table{t}
 }
 
-func NewPopulatedTable(cols int, records []Row) *Table {
+func NewPopulatedTable(cols int, records *[]Row) *Table {
 	t := NewTable(cols)
 	t.AddRecords(records)
 	return t
@@ -57,6 +58,7 @@ func (t *table) String() string {
 	return helpers.Format("Headers: %s, \nRows: \n%s", headers, rows)
 }
 
+// Lets you for x,y := range table.Iter() and loop across the rows.
 func (t *table) Iter() iter.Seq2[int, Row] {
 	return func(yield func(int, Row) bool) {
 		for i, row := range t.records {
@@ -82,7 +84,6 @@ func (t *table) HasHeaders() bool {
 	return t.hasHeaders
 }
 
-// Optional function.
 // Returns the indexes of columns without headers.
 func (t *table) MissingHeaders() []int {
 	headers := []int{}
@@ -108,7 +109,7 @@ func (t *table) Width() int {
 }
 
 // Returns whether the given Record is compatible with the instance of the table due to length, or not.
-func (t *table) IsCompatible(record Row) bool {
+func (t *table) IsCompatible(record *Row) bool {
 	return record.Size() == t.Width()
 }
 
@@ -121,7 +122,7 @@ func (t *table) Records() []Row {
 
 // Returns the Header Row.
 // NOTE: If there isn't a header in the table, it will return an empty row of length zero, and ErrHeaderMissing
-func (t *table) Headers() (Row, error) {
+func (t *table) Headers() (Row, error) { // Pass by value because I don't want a user to be able to edit the values of the headers separately.
 	if t.HasHeaders() {
 		return t.headers, nil
 	}
@@ -131,45 +132,65 @@ func (t *table) Headers() (Row, error) {
 // Specific Getters
 
 // Returns the specified Row across the records
-func (t *table) Record(i int) (Row, error) {
+func (t *table) Record(i int) (Row, error) { // Pass by value because I don't want the use editing values of the reocrds.
 	if indexWithinBounds(i, t.Entries()) {
 		return t.records[i], nil
 	}
 	return *NewRow(0), ErrOutOfBounds
 }
 
+func (t *table) Cell(recordIndex, column int) (string, error) {
+	record, err := t.Record(recordIndex)
+	if err != nil {
+		return EmptyCell().value, err
+	}
+
+	return record.Get(column)
+}
+
 // Returns the specified column in the table.
-func (t *table) Col(i int) (header string, colVals Row, err error) {
-	return "", *EmptyRow(), nil // TODO:
+func (t *table) Col(i int) (header string, colVals *Row, err error) {
+	return "", EmptyRow(), nil // TODO:
 }
 
 // Returns the Header of the specified column
-func (t *table) Header(i int) (Cell, error) {
+func (t *table) Header(i int) (string, error) {
 	if t.HasHeaders() {
-		return t.headers.cells[i], nil
+		return t.headers.cells[i].String(), nil
 	}
 
-	return *NewCell(""), nil
+	return EmptyCell().value, nil
+}
+
+// Returns the index of a given heading in the table.
+// Returns the index of the first encountered heading if there are multiple to choose from.
+func (t *table) IndexOf(heading string) int {
+	for i, cell := range t.headers.Iter() {
+		if reflect.DeepEqual(heading, cell.String()) {
+			return i
+		}
+	}
+	return -1
 }
 
 // Adders
 
 // Appends a Row to the Records
-func (t *table) AddRecord(r Row) error {
+func (t *table) AddRecord(r *Row) error {
 	if !t.IsCompatible(r) {
 		return ErrIncompatibleSize
 	}
-	t.records = append(t.records, r)
+	t.records = append(t.records, *r)
 	return nil
 }
 
 // Adds all the specified records, one by one.
 // If ANY of the specified records are incompatible, it will cancel the entire operation and return an error.
-func (t *table) AddRecords(records []Row) error {
+func (t *table) AddRecords(records *[]Row) error {
 	compatibleRows := []Row{}
 
-	for _, record := range records {
-		if !t.IsCompatible(record) {
+	for _, record := range *records {
+		if !t.IsCompatible(&record) {
 			return ErrIncompatibleSize
 		}
 
@@ -223,12 +244,12 @@ func (t *table) AddCol(header string, colValues Row) error {
 
 // Setters
 
-func (t *table) SetHeaders(headers Row) error {
+func (t *table) SetHeaders(headers *Row) error {
 	if !t.IsCompatible(headers) {
 		return ErrIncompatibleSize
 	}
 
-	t.headers = headers
+	t.headers = *headers
 	return nil
 }
 

@@ -82,7 +82,7 @@ func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 			t.Widen(row.Size())
 
 			if csv.hasHeadings {
-				_ = t.SetHeaders(*row) // Error should not appear since the table has been widened to have the same size as the header row
+				_ = t.SetHeaders(row) // Error should not appear since the table has been widened to have the same size as the header row
 				continue
 			}
 
@@ -91,7 +91,7 @@ func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 		// TODO: To make compatible with RFC 4180, instead I could repeatedly cut a preffix using strings.Index(content, ",") and some more fancy logic
 
 		// Add Record to table.
-		recErr := t.AddRecord(*row)
+		recErr := t.AddRecord(row)
 		if recErr != nil {
 			if errors.Is(recErr, table.ErrIncompatibleSize) {
 				// Convert to

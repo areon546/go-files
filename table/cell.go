@@ -19,6 +19,10 @@ func NewCell(value string) *Cell {
 	return &Cell{cell{value: value}}
 }
 
+func EmptyCell() *Cell {
+	return NewCell("")
+}
+
 func (c *cell) String() string {
 	return c.value
 }
