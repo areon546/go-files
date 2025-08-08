@@ -1,5 +1,5 @@
 all:
 	echo "Nothing"
 
-file: 
-	cd files && make test
+test:
+	go test ./... -cover

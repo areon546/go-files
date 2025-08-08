@@ -44,8 +44,8 @@ func (m markdownFormatter) FormatTable(t table.Table, heading bool) string {
 
 	s += headerDecleration
 
-	for i := 0; i < t.Rows(); i++ {
-		r, _ := t.GetRow(i)
+	for i := 0; i < t.Entries(); i++ {
+		r, _ := t.Record(i)
 		s += constructRow(r)
 	}
 
@@ -72,7 +72,11 @@ func markdownLink(embed bool, displayText, path string) (s string) {
 func constructRow(r table.Row) (row string) {
 	row += "|"
 	for i := 0; i < r.Size(); i++ {
-		v := r.Get(i)
+		v, err := r.Get(i)
+		if err != nil {
+			panic(err)
+		}
+
 		row += constructCell(v)
 	}
 

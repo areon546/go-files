@@ -152,3 +152,7 @@ func TestRowSize(t *testing.T) {
 func TestRowString(t *testing.T) {
 	// TODO: unsure what to have a an ideal string representation of a row
 }
+
+func TestJoin(t *testing.T) {
+	// TODO: test if it joins properly into a CSV line
+}

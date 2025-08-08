@@ -83,8 +83,6 @@ func TestHasHeaders(t *testing.T) {
 
 // test MissingHeaders
 func TestMissingHeaders(t *testing.T) {
-	// helpers.AssertEquals(t, "", "a")
-
 	// test 100% headers
 	// test 0% headers
 	// test partial headers
@@ -130,6 +128,17 @@ func TestEntries(t *testing.T) {
 	helpers.AssertEqualsInt(t, 5, tab.Entries())
 }
 
+func TestWidth(t *testing.T) {
+	// TODO:
+}
+
+func TestIsCompatible(t *testing.T) {
+	// TODO:
+}
+
+func TestWiden(t *testing.T) {
+}
+
 //
 
 // TestRecords
@@ -162,23 +171,71 @@ func TestHeaders(t *testing.T) {
 
 // TestRecord
 func TestRecord(t *testing.T) {
+	t.Run("accessing within bounds", func(t *testing.T) {
+		// TODO:
+	})
+
+	t.Run("accessing outside of bounds", func(t *testing.T) {
+		// TODO:
+	})
 }
 
 // TestCol
 func TestCol(t *testing.T) {
+	t.Run("accessing within bounds", func(t *testing.T) {
+		// TODO:
+	})
+
+	t.Run("accessing outside of bounds", func(t *testing.T) {
+		// TODO:
+	})
 }
 
 // TestHeader
 func TestHeader(t *testing.T) {
+	t.Run("accessing within bounds", func(t *testing.T) {
+		// TODO:
+	})
+
+	t.Run("accessing outside of bounds", func(t *testing.T) {
+		// TODO:
+	})
 }
 
 //
 
-// AddRow
+// AddRecord
 func TestAddRecord(t *testing.T) {
+	record := NewRow(2)
+	record.Set(0, "length")
+	record.Set(1, "width")
+
+	tab := NewTable(2)
+	helpers.AssertEqualsInt(t, 0, tab.Entries())
+
+	// ErrOutOfBounds when trying to access before populated
+	row0, err := tab.Record(0)
+	helpers.AssertError(t, err, ErrOutOfBounds)
+	_, err = row0.Get(0)
+	helpers.AssertError(t, err, ErrOutOfBounds)
+
+	tab.AddRecord(*record)
+	helpers.AssertEqualsInt(t, 1, tab.Entries())
+
+	// No ErrOutOfBounds after population
+	row0, err = tab.Record(0)
+	helpers.AssertNoError(t, err)
+	row0Val0, err := row0.Get(0)
+	helpers.AssertNoError(t, err)
+	helpers.AssertEquals(t, "length", row0Val0)
+
 	// what does adding a record do?
 	// it increases the size
 	// it creates a New thing at the end (check for err out of bounds b4 and After)
+}
+
+// AddRecords
+func TestAddRecords(t *testing.T) {
 }
 
 // AddCol
@@ -186,7 +243,6 @@ func TestAddCol(t *testing.T) {
 	tab := NewTable(0)
 	helpers.AssertEqualsInt(t, 0, tab.Cols())
 
-	// NOTE: commented out because currently crashing tests
 	row := NewRow(5)
 	err := tab.AddCol("ID", *row)
 	helpers.AssertNoError(t, err)

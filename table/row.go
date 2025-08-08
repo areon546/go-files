@@ -1,5 +1,7 @@
 package table
 
+import "iter"
+
 // Contract:
 // I will contain a list of Cells with a Set length.
 // If you want a specific cell, you give me the number and I give what is inside of it.
@@ -80,6 +82,30 @@ func (r *row) Size() int {
 
 func (r *row) String() string {
 	return format("size: %d, cells: %s", r.size, r.cells)
+}
+
+func (r *row) Join(beforeRow, cellPre, inbetweenCells, cellSuff, afterRow string) string {
+	str := ""
+
+	for i, cell := range r.cells {
+		str += cellPre + cell.value + cellSuff
+
+		if i != r.size {
+			str += inbetweenCells
+		}
+	}
+	return beforeRow + str + afterRow
+}
+
+// Iteration
+func (r *row) Iter() iter.Seq2[int, Cell] {
+	return func(yield func(int, Cell) bool) {
+		for i, cell := range r.cells {
+			if !yield(i, cell) {
+				return
+			}
+		}
+	}
 }
 
 // Creates [length] rows

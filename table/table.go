@@ -1,6 +1,10 @@
 package table
 
-import "github.com/areon546/go-helpers/helpers"
+import (
+	"iter"
+
+	"github.com/areon546/go-helpers/helpers"
+)
 
 type TableConverter func(t table) string
 
@@ -30,6 +34,37 @@ type (
 func NewTable(cols int) *Table {
 	t := table{records: makeRows(0, cols), headers: *NewRow(cols), headersEdited: true}
 	return &Table{t}
+}
+
+func NewPopulatedTable(cols int, records []Row) *Table {
+	t := NewTable(cols)
+	t.AddRecords(records)
+	return t
+}
+
+func EmptyTable() *Table {
+	return NewTable(0)
+}
+
+func (t *table) String() string {
+	headers := t.headers.String()
+
+	rows := ""
+	for _, row := range t.Iter() {
+		rows += row.String() + "\n"
+	}
+
+	return helpers.Format("Headers: %s, \nRows: \n%s", headers, rows)
+}
+
+func (t *table) Iter() iter.Seq2[int, Row] {
+	return func(yield func(int, Row) bool) {
+		for i, row := range t.records {
+			if !yield(i, row) {
+				return
+			}
+		}
+	}
 }
 
 // Returns whether the Table has had all columns populated with a header.
@@ -70,6 +105,16 @@ func (t *table) Entries() int {
 // Returns the number of columns the table has.
 func (t *table) Cols() int {
 	return t.headers.Size()
+}
+
+// Returns the width of the table, ie the number of columns.
+func (t *table) Width() int {
+	return t.Cols()
+}
+
+// Returns whether the given Record is compatible with the instance of the table due to length, or not.
+func (t *table) IsCompatible(record Row) bool {
+	return record.Size() == t.Width()
 }
 
 // Getters
@@ -115,8 +160,12 @@ func (t *table) Header(i int) (Cell, error) {
 // Setters
 
 // Appends a Row to the Records
-func (t *table) AddRecord(r Row) {
+func (t *table) AddRecord(r Row) error {
+	if !t.IsCompatible(r) {
+		return ErrIncompatibleSize
+	}
 	t.records = append(t.records, r)
+	return nil
 }
 
 // Adds a column to the table.
@@ -147,6 +196,44 @@ func (t *table) AddCol(header string, colValues Row) error {
 	t.headers.Lengthen(1)
 	t.headers.Set(lastIndex, header)
 
+	return nil
+}
+
+func (t *table) Widen(l int) {
+	t.headers.Lengthen(l)
+
+	for _, row := range t.Iter() {
+		row.Lengthen(l)
+	}
+}
+
+// Adds all the specified records, one by one.
+// If ANY of the specified records are incompatible, it will cancel the entire operation and return an error.
+func (t *table) AddRecords(records []Row) error {
+	compatibleRows := []Row{}
+
+	for _, record := range records {
+		if !t.IsCompatible(record) {
+			return ErrIncompatibleSize
+		}
+
+		compatibleRows = append(compatibleRows, record)
+
+	}
+
+	for _, record := range compatibleRows {
+		t.AddRecord(record)
+	}
+
+	return nil
+}
+
+func (t *table) SetHeaders(headers Row) error {
+	if !t.IsCompatible(headers) {
+		return ErrIncompatibleSize
+	}
+
+	t.headers = headers
 	return nil
 }
 

@@ -2,28 +2,24 @@ package files
 
 import (
 	"errors"
-	"reflect"
 	"strings"
 
+	"github.com/areon546/go-files/table"
 	"github.com/areon546/go-helpers/helpers"
 )
 
 var (
-	ErrInconsistentFieldNumber error = errors.New("CSV: Number of fields in CSV is inconsistent")
-	errMissingHeaders          error = errors.New("Headings are missing")
+	ErrInconsistentFieldNumber error = errors.New("csv: Number of fields in CSV is inconsistent")
+	errMissingHeaders          error = errors.New("headings are missing")
 	ErrMissingHeaders          error = helpers.WrapError("%w %w", errFiles, errMissingHeaders)
 )
 
 // ~~~~~~~~~~~~~~~~~~~~ CSVFile
 type CSVFile struct {
 	// TODO: ? convert to table datastructure
-	file     TextFile
-	contents [][]string
-
-	hasHeaders bool
-	width      int
-
-	// TODO: Add restrictions for using TextFile functionality, I don't want the user to be able to miscalaneously write XYZ without it updating the CSV datastructure.
+	file        *TextFile
+	table       *table.Table
+	hasHeadings bool
 }
 
 // I would like if this fulfilled the RFC 4180 specs, however allowing multi line CSVs isn't a necessary feature for me currently.
@@ -37,7 +33,9 @@ func NewCSVFile(filename string, headings bool) *CSVFile {
 	filename = AddFileType(filename, "csv") // redundant check to see if the file is a CSV file, ensures it is if it isn't already
 	file := NewTextFile(filename)
 
-	return &CSVFile{file: *file, hasHeaders: headings, contents: [][]string{}}
+	table := table.NewTable(0)
+
+	return &CSVFile{file: file, table: table, hasHeadings: headings}
 }
 
 // returns an array of headings and a 2d array of
@@ -48,101 +46,150 @@ func ReadCSV(filename string, headings bool) (csv *CSVFile, err error) {
 	return csv, err
 }
 
-// Returns -1 if: No headings, Heading not found
-// Otherwise: Returns the index of the heading.
-func (c *CSVFile) IndexOfCol(header string) (index int) {
-	if !c.hasHeaders || len(c.contents) == 0 {
-		return -1
-	}
-	headings := c.contents[0]
-	for i, heading := range headings {
-		if reflect.DeepEqual(heading, header) {
-			index = i
-		}
-	}
-
-	return
-}
-
-func (c *CSVFile) Row(i int) string { // TODO make more efficient
-	return strings.Join(c.contents[i], ",")
-	// return c.contentBuffer[i+1] // this is buggy, fix
-}
-
-func (c *CSVFile) Cell(row, col int) string {
-	return c.contents[row][col]
-}
-
-func (c *CSVFile) Cols() int {
-	if len(c.contents) == 0 {
-		return 0
-	} else {
-		return len(c.contents[0])
-	}
-}
-
-func (c *CSVFile) Rows() int {
-	return len(c.contents)
-}
-
-func (csv *CSVFile) HasHeaders() bool {
-	return csv.hasHeaders
-}
-
-func (csv *CSVFile) Headers() ([]string, error) {
-	emptyHeaders := []string{}
-
-	print(len(csv.contents))
-	if csv.hasHeaders && len(csv.contents) > 0 {
-		return csv.contents[0], nil
-	}
-
-	return emptyHeaders, ErrMissingHeaders
+func (csv *CSVFile) String() string {
+	return helpers.Format("File: %s\nHasHeadings: %t\nTable: \n%v\n", csv.file.Name(), csv.hasHeadings, csv.table)
 }
 
 // Reading a CSV file
 // Returns ErrInconsistentFieldNumber if the number of rows is inconsistent.
 func (csv *CSVFile) ReadContents() (err error) {
-	err = errEmpty
+	// Assumes the file attribute has been populated.
+	fileContents := csv.file.ReadFile()
 
-	contents := csv.file.ReadFile()
+	csv.table, err = csv.deserialise(fileContents)
+	return err
+}
+
+// Converts a []string that is supposed to represent a CSV file's lines, to a table
+func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
+	t := table.EmptyTable()
+
+	// go through each row in contents
+	// convert it to Row objects
+	// add said Row objects to the table
+	// return the table
 	firstLine := true
-	var csvContent [][]string
+	for _, content := range contents {
+		// for each line:
+		row := csvRecordToRow(content)
 
-	// Go through each line in the TextFile
-	for index, record := range contents {
-		line := index + 1
-		// Go to the next line, if the line in the record is empty.
-		if reflect.DeepEqual(record, "") {
-			continue
-		} else {
-			cells := strings.Split(record, ",")
+		if firstLine {
+			firstLine = false
+			t.Widen(row.Size())
 
-			if firstLine {
-				// first line indicates headings,
-				csv.width = len(cells)
-				firstLine = false
+			if csv.hasHeadings {
+				err := t.SetHeaders(*row)
+				if err != nil {
+					panic(err)
+				}
+				continue
 			}
 
-			// Check for errors
-			if csv.width != len(cells) {
-				lineError := helpers.WrapError("%w at line: %d", ErrInconsistentFieldNumber, line)
-				err = errors.Join(err, lineError) // Say: Happens on index XYZ
+		}
+
+		// TODO: To make compatible with RFC 4180, instead I could repeatedly cut a preffix using strings.Index(content, ",") and some more fancy logic
+
+		// Add Record to table.
+		err := t.AddRecord(*row)
+		if err != nil {
+			if errors.Is(err, table.ErrIncompatibleSize) {
+				// TODO: Add to Error return to have a list of all errors returned.
 			}
-
-			csvContent = append(csvContent, cells)
-
-			// TODO: Honestly, for now it would take a lot of effort to make this coincide with the  RFC 4180
-			// specification of a CSV file, that for now I will accept it not being completely inline with the specs. I will simply update relevant comments.
 		}
 	}
-	csv.contents = csvContent
 
-	return returnErr(err)
+	return t, nil
 }
 
-/* Overwritten Functions */
+func csvRecordToRow(csvRecord string) *table.Row {
+	cells := strings.Split(csvRecord, ",")
+	row := table.NewRow(len(cells))
 
-func (c *CSVFile) Contents() [][]string {
-	return c.contents
+	for i, cell := range cells {
+		_ = row.Set(i, cell) // Error ignored because the Row is set to have the same length as number of cells.
+	}
+
+	return row
 }
+
+func (c *CSVFile) WriteContents() {
+	contents, _ := c.serialise(c.table) // TODO: handle this error
+
+	c.file.ClearFile()
+	c.file.AppendLines(contents, true)
+	c.file.WriteBuffer()
+}
+
+func (csv *CSVFile) serialise(table *table.Table) (contents []string, err error) {
+	rows := table.Records()
+
+	for _, row := range rows {
+		line := row.Join("", "", ",", "", "")
+		contents = append(contents, line)
+	}
+
+	return
+}
+
+func (c *CSVFile) Contents() []string {
+	contents, _ := c.serialise(c.table)
+
+	return contents
+}
+
+// TODO: Overwrite the below methods
+// NOTE:
+// All of the methods below should ONLY edit the csv.table parameter, and then when the user wants to finish writing,
+// they should call WriteContents()
+
+// // Returns -1 if: No headings, Heading not found
+// // Otherwise: Returns the index of the heading.
+// func (c *CSVFile) IndexOfCol(header string) (index int) {
+// 	if !c.hasHeaders || len(c.contents) == 0 {
+// 		return -1
+// 	}
+// 	headings := c.contents[0]
+// 	for i, heading := range headings {
+// 		if reflect.DeepEqual(heading, header) {
+// 			index = i
+// 		}
+// 	}
+//
+// 	return
+// }
+//
+// func (c *CSVFile) Row(i int) string { // TODO make more efficient
+// 	return strings.Join(c.contents[i], ",")
+// 	// return c.contentBuffer[i+1] // this is buggy, fix
+// }
+//
+// func (c *CSVFile) Cell(row, col int) string {
+// 	return c.contents[row][col]
+// }
+//
+// func (c *CSVFile) Cols() int {
+// 	if len(c.contents) == 0 {
+// 		return 0
+// 	} else {
+// 		return len(c.contents[0])
+// 	}
+// }
+//
+// func (c *CSVFile) Rows() int {
+// 	return len(c.contents)
+// }
+//
+// func (csv *CSVFile) HasHeaders() bool {
+// 	return csv.hasHeaders
+// }
+//
+// func (csv *CSVFile) Headers() ([]string, error) {
+// 	emptyHeaders := []string{}
+//
+// 	print(len(csv.contents))
+// 	if csv.hasHeaders && len(csv.contents) > 0 {
+// 		return csv.contents[0], nil
+// 	}
+//
+// 	return emptyHeaders, ErrMissingHeaders
+// }
