@@ -11,7 +11,7 @@ import (
 
 func handle(err error) {
 	// helpers.Handle(err)
-	print("files package handling error", err)
+	debugPrint("files package handling error", err)
 	helpers.Handle(err)
 }
 
