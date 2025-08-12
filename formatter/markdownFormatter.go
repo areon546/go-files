@@ -2,7 +2,6 @@ package formatter
 
 import (
 	"github.com/areon546/go-files/table"
-	"github.com/areon546/go-helpers/helpers"
 )
 
 type markdownFormatter struct{}
@@ -11,15 +10,15 @@ func NewMarkdownFormatter() markdownFormatter {
 	return markdownFormatter{}
 }
 
-func (m markdownFormatter) FormatLink(displayText, link string) string {
+func (m markdownFormatter) Link(displayText, link string) string {
 	return markdownLink(false, displayText, link)
 }
 
-func (m markdownFormatter) FormatEmbed(link string) string {
+func (m markdownFormatter) Embed(link string) string {
 	return markdownLink(true, "", link)
 }
 
-func (m markdownFormatter) FormatHeading(tier int, heading string) string {
+func (m markdownFormatter) Heading(tier int, heading string) string {
 	s := ""
 
 	for range tier {
@@ -29,34 +28,33 @@ func (m markdownFormatter) FormatHeading(tier int, heading string) string {
 	return s + " " + heading
 }
 
-func (m markdownFormatter) FormatTable(t table.Table, heading bool) string {
+func (m markdownFormatter) Table(t table.Table) string {
 	s := ""
+	headers := ""
 
 	// TODO: Need to create Headers, to be able to fix the formatter implementation, to be able to fix the NovaSkins file writing for asset pages implementation.
 	headersRow, err := t.Headers()
-	helpers.Handle(err)
-	headers := constructRow(headersRow)
-	headerDecleration := markdownHeaderDeclarationRow(headersRow.Size())
-
-	if heading {
+	if err != nil {
+		headers = constructRow(headersRow)
 		s += headers
 	}
+	headerDecleration := markdownHeaderDeclarationRow(t.Width())
 
 	s += headerDecleration
 
-	for i := 0; i < t.Entries(); i++ {
-		r, _ := t.Record(i)
-		s += constructRow(r)
+	// Add records
+	for _, rec := range t.Iter() {
+		s += constructRow(rec)
 	}
 
 	return s
 }
 
-func (m markdownFormatter) FormatBold(s string) string {
+func (m markdownFormatter) Bold(s string) string {
 	return format("**%s**", s)
 }
 
-func (m markdownFormatter) FormatItalic(s string) string {
+func (m markdownFormatter) Italic(s string) string {
 	return format("*%s*", s)
 }
 
@@ -69,24 +67,8 @@ func markdownLink(embed bool, displayText, path string) (s string) {
 	return
 }
 
-func constructRow(r table.Row) (row string) {
-	row += "|"
-	for i := 0; i < r.Size(); i++ {
-		v, err := r.Get(i)
-		if err != nil {
-			panic(err)
-		}
-
-		row += constructCell(v)
-	}
-
-	row += "\n" // since a row needs to start and end with a | on a new line to be valid
-
-	return
-}
-
-func constructCell(cell string) string {
-	return cell + " | "
+func constructRow(r table.Row) string {
+	return r.Join("|", "", "|", "", "|")
 }
 
 func markdownHeaderDeclarationRow(length int) string {

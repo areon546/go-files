@@ -6,12 +6,12 @@ import (
 )
 
 type Formatter interface {
-	FormatLink(displayText, path string) string
-	FormatEmbed(path string) string
-	FormatHeading(tier int, heading string) string
-	FormatTable(t table.Table, headers bool) string
-	FormatBold(s string) string
-	FormatItalic(s string) string
+	Link(displayText, path string) string
+	Embed(path string) string
+	Heading(tier int, heading string) string
+	Table(t table.Table) string
+	Bold(s string) string
+	Italic(s string) string
 }
 
 // ~~~~~~~~~~~~~~~~~~~~ FormattedFile
@@ -20,10 +20,10 @@ type FormattedFile struct {
 	Fmt Formatter
 }
 
-func NewHTMLFile(path, filename, IWANTERRORS string) *FormattedFile {
-	filepath := files.AddFileType(path+filename, "html")
-	return newFormattedFile(NewMarkdownFormatter(), filepath)
-}
+// func NewHTMLFile(path, filename, IWANTERRORS string) *FormattedFile {
+// 	filepath := files.AddFileType(path+filename, "html")
+// 	return newFormattedFile(NewMarkdownFormatter(), filepath)
+// }
 
 func NewMarkdownFile(path, filename, IWantErrorsWrong string) *FormattedFile {
 	filepath := files.AddFileType(path+filename, "md")
@@ -35,21 +35,21 @@ func newFormattedFile(fmt Formatter, filePath string) *FormattedFile {
 }
 
 func (m *FormattedFile) AppendLink(displayText, path string) {
-	m.Append(m.Fmt.FormatLink(displayText, path), false)
+	m.Append(m.Fmt.Link(displayText, path), false)
 }
 
 func (m *FormattedFile) AppendEmbed(path string) {
-	m.Append(m.Fmt.FormatEmbed(path), false)
+	m.Append(m.Fmt.Embed(path), false)
 }
 
 func (m *FormattedFile) AppendHeading(tier int, heading string) {
-	m.Append(m.Fmt.FormatHeading(tier, heading), false)
+	m.Append(m.Fmt.Heading(tier, heading), false)
 }
 
 func (m *FormattedFile) AppendItalics(heading string) {
-	m.Append(m.Fmt.FormatItalic(heading), false)
+	m.Append(m.Fmt.Italic(heading), false)
 }
 
 func (m *FormattedFile) AppendBold(heading string) {
-	m.Append(m.Fmt.FormatBold(heading), false)
+	m.Append(m.Fmt.Bold(heading), false)
 }
