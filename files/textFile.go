@@ -2,7 +2,6 @@ package files
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/areon546/go-helpers/helpers"
@@ -11,7 +10,7 @@ import (
 // Contract:
 //   - you can use me to write to files.
 type TextFile struct {
-	File
+	File       // May consider making this an attribute, rather than embed it like this
 	textBuffer []string
 	lines      int
 }
@@ -20,40 +19,72 @@ func NewTextFile(filePath string) *TextFile {
 	return &TextFile{File: *NewFile(filePath)}
 }
 
-func (f *TextFile) Contents() []string {
-	return f.textBuffer
+// Reading and Writing from and to the TextFile.
+
+func (t *TextFile) ReadContents() []string {
+	bytes, err := t.File.ReadContents()
+	handle(err)
+
+	t.textBuffer = t.deserialise(bytes)
+	t.lines = len(t.contentBuffer)
+
+	return t.textBuffer
 }
 
-func (f *TextFile) ReadFile() []string {
-	if !f.hasBeenRead {
-		data, err := os.ReadFile(f.Name()) // For read access.
-		handle(err)
+// Convert from byte format (lower level struct) to human readable strings (struct )
+func (f *TextFile) deserialise(bytes []byte) []string {
+	oneLine := strings.ReplaceAll(string(bytes), "\r", "")
+	// NOTE: This was done because Windows uses CR LF to denote line ends, while linux only uses LF
+	// the only time this should break, should be in a system that uses CR, \r, to denote new lines,
+	// however so far as I understand, that is only reserved to really old OS'
 
-		oneLine := strings.ReplaceAll(string(data), "\r", "")
-		f.textBuffer = strings.Split(oneLine, "\n")
-		f.lines = len(f.contentBuffer)
-	}
-	return f.textBuffer
+	strings := strings.Split(oneLine, "\n")
+	return strings
 }
 
-func (f *TextFile) ReadLine(lineNum int) (output string, err error) {
+func (t *TextFile) ReadLine(lineNum int) (output string, err error) {
 	lineNum -= 1 // converted to index notation
 
-	if f.IsEmpty() {
-		f.ReadFile()
+	if t.IsEmpty() {
+		t.ReadContents()
 	}
 
-	if lineNum > f.lines {
+	if t.IsEmpty() {
+		// If still empty, TODO: return error
+	}
+
+	if lineNum > t.lines {
 		return "", errors.New("Index out of bounds for File length")
 	}
 
-	output = string(f.textBuffer[lineNum])
+	output = string(t.textBuffer[lineNum])
 	// print(output)
 
 	return
 }
 
-func (t *TextFile) WriteLine(s string, i int, newline bool) {
+func (t *TextFile) WriteContents() {
+	bytes := t.serialise(t.textBuffer)
+
+	t.File.Append(bytes)
+	t.File.WriteContents()
+}
+
+// Converts from the TextFile struct data format ([]string), to the data format down the chain,
+func (t *TextFile) serialise(lines []string) []byte {
+	textAsOneLine := strings.Join(t.textBuffer, "\n")
+	return helpers.StringToBytes(textAsOneLine)
+}
+
+// Misc
+
+func (f *TextFile) Contents() []string {
+	return f.textBuffer
+}
+
+// ~~~ Append
+
+func (t *TextFile) SetLine(s string, i int, newline bool) {
 	for i >= len(t.textBuffer) {
 		t.textBuffer = append(t.textBuffer, s)
 	}
@@ -63,20 +94,12 @@ func (t *TextFile) WriteLine(s string, i int, newline bool) {
 	}
 
 	t.textBuffer[i] = s
-	t.File.Append(helpers.StringToBytes(s))
 }
 
-func (t *TextFile) WriteBuffer() {
-	// convert bytes buffer to bytes
-	textAsOneLine := strings.Join(t.textBuffer, "\n")
-
-	bytes := helpers.StringToBytes(textAsOneLine)
-
-	// write text buffer
-	t.Write(bytes)
+func (f *TextFile) Append(s string, newline bool) {
+	f.SetLine(s, len(f.contentBuffer), newline)
 }
 
-// ~~~ Append
 func (t *TextFile) AppendLastLine(s string) {
 	lastLine := len(t.contentBuffer) - 1
 
@@ -84,17 +107,13 @@ func (t *TextFile) AppendLastLine(s string) {
 		lastLine = 0
 	}
 
-	t.WriteLine(s, lastLine, true)
+	t.SetLine(s, lastLine, true)
 }
 
 func (t *TextFile) AppendLines(arr []string, newline bool) {
 	for _, v := range arr {
 		t.Append(v, newline)
 	}
-}
-
-func (f *TextFile) Append(s string, newline bool) {
-	f.WriteLine(s, len(f.contentBuffer), newline)
 }
 
 func (f *TextFile) AppendNewLine(s string) {

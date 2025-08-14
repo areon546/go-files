@@ -51,7 +51,7 @@ func SplitDirectories(filePath string) (dirs []string, filename string) {
 // Rule: Directories end with `/`
 // Rule: Files don't end with a `/`
 // When processing directory or not, if the last one has a dot in it,
-func SplitFilePath(filePath string) (path, name, filetype string) {
+func SplitFilePath(filePath string) (path, filename string) {
 	dirs, filename := SplitDirectories(filePath)
 	// NOTE: I could make this slightly more optimised by not turning the filepath into a string array and then joining it back up again.
 	// However, there are some rules that I want to be sure are maintained, and there are more important things.
@@ -70,11 +70,7 @@ func SplitFilePath(filePath string) (path, name, filetype string) {
 		}
 	}
 
-	name, filetype = splitFileName(filename)
-	debugPrint("SplitFilePath: ", "fn", filename, "name", name, "suff", filetype)
-
-	debugPrint("Return values: ", path, name, filetype)
-	return path, name, filetype
+	return path, filename
 }
 
 func JoinDirs(dirs []string) (dirPath string) {
@@ -83,7 +79,7 @@ func JoinDirs(dirs []string) (dirPath string) {
 
 // Name is the whole name up to the very very last .xxx at the end of a filename.
 // EG asd.jar.JAR.jar.txt will consider the filename as asd.jar.JAR.jar and the type as txt
-func splitFileName(filename string) (name, filetype string) {
+func SplitFileName(filename string) (name, filetype string) {
 	// split it up by .'s
 	startOfFileType := strings.LastIndex(filename, ".")
 

@@ -1,9 +1,12 @@
 package files
 
 import (
+	"errors"
 	"io"
 	"os"
 	"reflect"
+	"strings"
+	"syscall"
 
 	"github.com/areon546/go-helpers/helpers"
 )
@@ -27,11 +30,9 @@ type File struct {
 type file struct {
 	path     string // path attribute has to be a directory, ie ending with a `/`
 	filename string
-	suffix   string
 
 	contentBuffer    []byte
 	compiledFilePath string
-	hasBeenRead      bool
 
 	bytesRead int
 }
@@ -60,7 +61,7 @@ Close - writes buffer
 // The intended way to create files if they exist within memory.
 func OpenFile(path string) (f *File, err error) {
 	f = NewFile(path)
-	err = f.ReadContents()
+	_, err = f.ReadContents()
 	return
 }
 
@@ -70,13 +71,11 @@ func OpenFile(path string) (f *File, err error) {
 // * the new file will have empty contents, inte
 func NewFile(filePath string) *File {
 	debugPrint("Creating new file at path: ", filePath)
-	path, fn, suff := SplitFilePath(filePath)
+	path, fn := SplitFilePath(filePath)
 
-	f := file{path: path, filename: fn, suffix: suff}
+	f := file{path: path, filename: fn}
 
-	f.hasBeenRead = false
-
-	debugPrint("New File created", filePath, &f, "filename:", fn, "suffix:", suff, "filename:", f.filename)
+	debugPrint("New File created", filePath, &f, "filename:", fn, "filename:", f.filename)
 	return &File{f}
 }
 
@@ -199,9 +198,35 @@ func (f *File) Read(p []byte) (n int, err error) {
 // Allows a user to create a file using `NewFile` and then later load the contents into the buffer as desired.
 // Returns:
 // - os.ErrNotExist if the file object does not exist in the file system.
-func (f *File) ReadContents() error {
-	contents, err := os.ReadFile(f.Name())
+func (f *File) ReadContents() ([]byte, error) {
+	contents, err := f.deserialise()
 	f.Append(contents)
+	return contents, err
+}
+
+// Load data from file to struct
+func (f *File) deserialise() ([]byte, error) {
+	return os.ReadFile(f.Name())
+}
+
+// Writes the content buffer to the file in the file system.
+func (f *File) WriteContents() error {
+	return f.serialise(f.Contents())
+}
+
+// Load data in struct buffer to file
+func (f *File) serialise(bytes []byte) error {
+	err := f.ClearFile()
+	if err != nil {
+
+		isNoFileOrDir := errors.Is(err, syscall.ENOENT)
+		if isNoFileOrDir { // EG: if the name of the file is "", this returns 'no such file or directory'
+			return ErrNoFileOrDirectory
+		}
+		return helpers.WrapError("files: aborted due to error %s", err)
+	}
+
+	_, err = f.Write(bytes)
 	return err
 }
 
@@ -216,18 +241,13 @@ func (f *File) ClearFile() error {
 	return writeToFile(f.Name(), make([]byte, 0))
 }
 
-// Writes the content buffer to the file in the file system.
-func (f *File) Close() error {
-	err := f.ClearFile()
-	if err != nil {
-		return err
-	}
-
-	_, err = f.Write(f.Contents())
-	return err
-}
-
 /* Misc methods */
+
+// Renames the filename of the file object.
+func (f *File) Rename(path, name string) {
+	f.path = path
+	f.filename = name
+}
 
 // Returns if the file buffer is empty.
 func (f *File) IsEmpty() bool {
@@ -252,26 +272,26 @@ func (f *File) Name() string {
 	if f.filename == "" {
 		return ""
 	}
-	return f.Path() + f.filename + "." + f.suffix
+	return f.Path() + f.filename
 }
 
 // Returns the directory of the specified file.
 // Promise: Must end with a '/'
 func (f *File) Path() string {
-	pathNotCompiled := reflect.DeepEqual(f.compiledFilePath, "")
-	if pathNotCompiled {
-		path := f.path
-		if reflect.DeepEqual(path, "") {
-			path += "."
-		}
+	path := f.path
 
-		// check if path ends with a "/"
-		if !PathIsDir(path) {
-			path += "/"
-		}
-
-		f.compiledFilePath = path
+	emptyPath := reflect.DeepEqual(path, "")
+	pathPreffix := strings.HasPrefix(path, "./")
+	if emptyPath || !pathPreffix {
+		path = "./" + path
 	}
+
+	// check if path ends with a "/"
+	if !PathIsDir(path) {
+		path += "/"
+	}
+
+	f.compiledFilePath = path
 
 	return f.compiledFilePath
 }

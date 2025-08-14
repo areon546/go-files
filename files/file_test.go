@@ -8,8 +8,15 @@ import (
 )
 
 var (
-	realFile  File
-	fakeFile  File
+	realName string = "./files/test.txt"
+	realFile File
+
+	duplicateName string = "./files/test2.txt"
+	duplicateReal File
+
+	fakeName string = "./files/faketest.txt"
+	fakeFile File
+
 	emtpyFile File
 )
 
@@ -18,32 +25,39 @@ func init() {
 	print("Setting up file_test")
 	defer print("Finished setting up file_test\n")
 
-	realFile = *NewFile("test.txt")
-	fakeFile = *NewFile("faketest.txt")
-	emtpyFile = *EmptyFile()
-
+	realFile = *NewFile(realName)
+	realFile.ClearFile()
 	realFile.Append([]byte("[dragons are cool]"))
+
+	duplicateReal = *NewFile(duplicateName)
+	duplicateReal.ClearFile()
+
+	fakeFile = *NewFile(fakeName)
+
+	emtpyFile = *EmptyFile()
 }
 
 /* ~~~ Creating File objects */
 
-// NewFile
+// NewFile lets you create digital file objects
 func TestNewFile(t *testing.T) {
 	// test that the path given to the file is appropriate
 	// test that files start empty unless reading
 
-	// t.Run("New File", func(t *testing.T) {
-	// 	nFile := NewFile("")
-	// 	nFile.Close()
-	// })
-	//
-	//
-	// t.Run("Non-existant File", func(t *testing.T) {
-	// 	OpenFile("files/faketest.txt")
-	// })
+	t.Run("New File", func(t *testing.T) {
+		nFile := NewFile("")
+		err := nFile.WriteContents()
+
+		print("ERER", err)
+		helpers.AssertError(t, err, ErrNoFileOrDirectory)
+	})
+
+	t.Run("Non-existant File", func(t *testing.T) {
+		NewFile("files/faketest.txt")
+	})
 }
 
-// OpenFile
+// OpenFile lets you load files from the filesys to memory
 func TestOpenFile(t *testing.T) {
 	t.Run("Open Existing File", func(t *testing.T) {
 		_, err := OpenFile("files/test.txt")
@@ -52,7 +66,7 @@ func TestOpenFile(t *testing.T) {
 		//
 
 		// assert there is an error
-		helpers.AssertError(t, err, nil)
+		helpers.AssertNoError(t, err)
 	})
 
 	t.Run("Non-existant File", func(t *testing.T) {
@@ -62,7 +76,15 @@ func TestOpenFile(t *testing.T) {
 	})
 }
 
-// EmptyFile
+// ReadContents reads the already present file content
+func TestFileReadContents(t *testing.T) {
+}
+
+// WriteContents writes the contents of the buffer onto
+func TestFileWriteContents(t *testing.T) {
+}
+
+// EmptyFile is a 'nil' file for comparisons, used internally, to ensure
 func TestEmptyFile(t *testing.T) {
 	// representation of an empty file for comparisons and handling, and the like
 	empty := EmptyFile()
@@ -169,6 +191,27 @@ func TestName(t *testing.T) {
 			helpers.AssertEquals(t, tC.expected, name)
 		})
 	}
+}
+
+func TestRename(t *testing.T) {
+	f := realFile
+	o := realFile
+	helpers.AssertEquals(t, "./files/test.txt", realFile.Name())
+
+	new := "files/test2.txt"
+	path, fn := SplitFilePath(new)
+	f.Rename(path, fn)
+
+	helpers.AssertEquals(t, "./files/test2.txt", f.Name()) // Test the internal file path has changed
+	helpers.AssertEquals(t, "./files/test.txt", o.Name())
+
+	// Test it will write and not overwrite the original
+	err := f.WriteContents()
+	helpers.AssertNoError(t, err)
+
+	f2, err := OpenFile(new)
+	helpers.AssertNoError(t, err)
+	helpers.AssertEquals(t, string(o.Contents()), string(f2.Contents()))
 }
 
 // Path

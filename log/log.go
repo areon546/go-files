@@ -51,7 +51,7 @@ func (logger fileLogger) Output(a ...any) {
 func (logger fileLogger) Close() {
 	DebugPrint("closing file logger ")
 
-	logger.logFile.Close()
+	logger.logFile.WriteContents()
 }
 
 // NO LOG

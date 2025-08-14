@@ -19,7 +19,7 @@ var (
 // Convenient usage is: ReadContents() and WriteContents()
 type CSVFile struct {
 	*table.Table           // I want all Table methods to be available.
-	file         *TextFile // I want to control access to file methods.
+	file         *TextFile // I want to control access to file methods and overwrite them as need by
 	hasHeadings  bool
 }
 
@@ -55,7 +55,7 @@ func (csv *CSVFile) String() string {
 // Returns ErrInconsistentFieldNumber if the number of rows is inconsistent.
 func (csv *CSVFile) ReadContents() (err error) {
 	// Assumes the file attribute has been populated.
-	fileContents := csv.file.ReadFile()
+	fileContents := csv.file.ReadContents()
 
 	csv.Table, err = csv.deserialise(fileContents)
 	return err
@@ -126,14 +126,15 @@ func csvRecordToRow(csvRecord string) *table.Row {
 }
 
 func (c *CSVFile) WriteContents() {
-	contents, _ := c.serialise(c.Table) // TODO: handle this error
+	contents := c.serialise(c.Table) // TODO: handle this error
 
 	c.file.ClearFile()
 	c.file.AppendLines(contents, true)
-	c.file.WriteBuffer()
+	c.file.WriteContents()
 }
 
-func (csv *CSVFile) serialise(table *table.Table) (contents []string, err error) {
+// Converts from datastructure format (table), to TextFile format []string
+func (csv *CSVFile) serialise(table *table.Table) (contents []string) {
 	rows := table.Records()
 
 	for _, row := range rows {
@@ -145,7 +146,7 @@ func (csv *CSVFile) serialise(table *table.Table) (contents []string, err error)
 }
 
 func (c *CSVFile) Contents() []string {
-	contents, _ := c.serialise(c.Table)
+	contents := c.serialise(c.Table)
 
 	return contents
 }

@@ -114,29 +114,26 @@ func TestSplitFilePath(t *testing.T) {
 
 		path     string
 		filename string
-		suffix   string
 	}{
-		{"./test.txt1", "./", "test", "txt1"},
-		{"./test.txt.txt2", "./", "test.txt", "txt2"},
-		{"../test.txt3", "../", "test", "txt3"},
-		{"/test.txt4", "/", "test", "txt4"},
-		{"/test", "/", "test", ""},
-		{"asd.md6", "", "asd", "md6"},
-		{"../custom_skins/custom_skins", "../custom_skins/", "custom_skins", ""},
-		{"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas", "cs"},
+		{"./test.txt1", "./", "test.txt1"},
+		{"./test.txt.txt2", "./", "test.txt.txt2"},
+		{"../test.txt3", "../", "test.txt3"},
+		{"/test.txt4", "/", "test.txt4"},
+		{"/test", "/", "test"},
+		{"asd.md6", "", "asd.md6"},
+		{"../custom_skins/custom_skins", "../custom_skins/", "custom_skins"},
+		{"../dd/custom_skins/cas.cs", "../dd/custom_skins/", "cas.cs"},
 	}
 
 	for _, test := range testCases {
 
 		filename := test.filename
-		suffix := test.suffix
 
 		t.Run(" "+test.message, func(t *testing.T) {
-			path, fn, sf := SplitFilePath(test.message)
+			path, fn := SplitFilePath(test.message)
 
 			helpers.AssertEquals(t, test.path, path)
 			helpers.AssertEquals(t, filename, fn)
-			helpers.AssertEquals(t, suffix, sf)
 		})
 	}
 }
@@ -158,7 +155,7 @@ func TestSplitFileName(t *testing.T) {
 
 	for _, test := range testCases {
 		t.Run(test.message, func(t *testing.T) {
-			fn, sf := splitFileName(test.path)
+			fn, sf := SplitFileName(test.path)
 
 			helpers.AssertEquals(t, test.filename, fn)
 			helpers.AssertEquals(t, test.suffix, sf)

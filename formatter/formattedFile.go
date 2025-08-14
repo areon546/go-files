@@ -7,7 +7,7 @@ import (
 
 type Formatter interface {
 	Link(displayText, path string) string
-	Embed(path string) string
+	Embed(path, alt string) string
 	Heading(tier int, heading string) string
 	Table(t table.Table) string
 	Bold(s string) string
@@ -38,8 +38,8 @@ func (m *FormattedFile) AppendLink(displayText, path string) {
 	m.Append(m.Fmt.Link(displayText, path), false)
 }
 
-func (m *FormattedFile) AppendEmbed(path string) {
-	m.Append(m.Fmt.Embed(path), false)
+func (m *FormattedFile) AppendEmbed(path, alt string) {
+	m.Append(m.Fmt.Embed(path, alt), false)
 }
 
 func (m *FormattedFile) AppendHeading(tier int, heading string) {

@@ -3,6 +3,7 @@ package files
 import (
 	"testing"
 
+	"github.com/areon546/go-files/table"
 	"github.com/areon546/go-helpers/helpers"
 )
 
@@ -60,6 +61,22 @@ func TestReadContents(t *testing.T) {
 	})
 
 	// helpers.AssertEqualsInt(t, 0, 1)
+}
+
+func TestCSVWriteContents(t *testing.T) {
+	t.Run("add record", func(t *testing.T) {
+		tab := standardCSV
+		helpers.AssertEqualsInt(t, 2, tab.Entries())
+
+		r := table.NewRow(tab.Width())
+		r.Set(0, "4")
+		r.Set(1, "8")
+		r.Set(2, "1")
+		r.Set(3, "2")
+
+		tab.AddRecord(r)
+		helpers.AssertEqualsInt(t, 3, tab.Entries())
+	})
 }
 
 //

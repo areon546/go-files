@@ -14,8 +14,8 @@ func (m markdownFormatter) Link(displayText, link string) string {
 	return markdownLink(false, displayText, link)
 }
 
-func (m markdownFormatter) Embed(link string) string {
-	return markdownLink(true, "", link)
+func (m markdownFormatter) Embed(embed, alt string) string {
+	return markdownLink(true, alt, embed)
 }
 
 func (m markdownFormatter) Heading(tier int, heading string) string {
