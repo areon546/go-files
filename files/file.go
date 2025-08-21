@@ -2,6 +2,7 @@ package files
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"reflect"
@@ -74,6 +75,7 @@ func NewFile(filePath string) *File {
 	path, fn := SplitFilePath(filePath)
 
 	f := file{path: path, filename: fn}
+	f.contentBuffer = []byte{}
 
 	debugPrint("New File created", filePath, &f, "filename:", fn, "filename:", f.filename)
 	return &File{f}
@@ -201,12 +203,21 @@ func (f *File) Read(p []byte) (n int, err error) {
 func (f *File) ReadContents() ([]byte, error) {
 	contents, err := f.deserialise()
 	f.Append(contents)
+
+	// Error check for errors similar to syscall.ENOENT "no such file or directory"
+	if err != nil && strings.Contains(err.Error(), "no such file or directory") {
+		fmt.Println(f.Name(), err)
+
+		err = newErrNoFileOrDirectory(f.Name())
+	}
 	return contents, err
 }
 
 // Load data from file to struct
 func (f *File) deserialise() ([]byte, error) {
-	return os.ReadFile(f.Name())
+	bytes, err := os.ReadFile(f.Name())
+
+	return bytes, err
 }
 
 // Writes the content buffer to the file in the file system.
@@ -230,7 +241,7 @@ func (f *File) serialise(bytes []byte) error {
 	return err
 }
 
-// Appends the byte array passed through to the end of the content buffer.
+// Appends to the end of the buffer.
 func (f *File) Append(bytes []byte) {
 	// adds bytes array given to the end of the buffer
 	f.contentBuffer = append(f.contentBuffer, bytes...)

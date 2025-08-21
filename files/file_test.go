@@ -1,7 +1,10 @@
 package files
 
 import (
+	"bytes"
+	"fmt"
 	"os"
+	"syscall"
 	"testing"
 
 	"github.com/areon546/go-helpers/helpers"
@@ -48,12 +51,20 @@ func TestNewFile(t *testing.T) {
 		nFile := NewFile("")
 		err := nFile.WriteContents()
 
-		print("ERER", err)
 		helpers.AssertError(t, err, ErrNoFileOrDirectory)
+		helpers.AssertError(t, err, syscall.ENOENT) // ErrNoFileOrDirectory is a wrapper for syscall ENOENT
 	})
 
 	t.Run("Non-existant File", func(t *testing.T) {
-		NewFile("files/faketest.txt")
+		f := NewFile("files/faketest.txt")
+		want := []byte{}
+		get, err := f.ReadContents()
+
+		// NOTE: Since asserting the actual error is difficult, and I have tried but been able to find the relevant error for
+		helpers.AssertError(t, err, ErrNoFileOrDirectory)
+		helpers.AssertEqualsBytes(t, want, get)
+
+		fmt.Println("ASDASD", bytes.Equal(want, get))
 	})
 }
 
@@ -74,14 +85,6 @@ func TestOpenFile(t *testing.T) {
 
 		helpers.AssertError(t, err, os.ErrNotExist)
 	})
-}
-
-// ReadContents reads the already present file content
-func TestFileReadContents(t *testing.T) {
-}
-
-// WriteContents writes the contents of the buffer onto
-func TestFileWriteContents(t *testing.T) {
 }
 
 // EmptyFile is a 'nil' file for comparisons, used internally, to ensure
@@ -122,6 +125,14 @@ func TestEmptyFile(t *testing.T) {
 }
 
 /* ~~~ Reading and Writing */
+
+// ReadContents reads the already present file content
+func TestFileReadContents(t *testing.T) {
+}
+
+// WriteContents writes the contents of the buffer onto
+func TestFileWriteContents(t *testing.T) {
+}
 
 // func TestClearFile(t *testing.T) {
 // 	// test file with data written to the file, data will be overwritten

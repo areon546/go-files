@@ -21,14 +21,16 @@ func NewTextFile(filePath string) *TextFile {
 
 // Reading and Writing from and to the TextFile.
 
-func (t *TextFile) ReadContents() []string {
+func (t *TextFile) ReadContents() ([]string, error) {
 	bytes, err := t.File.ReadContents()
-	handle(err)
+	if err != nil {
+		return []string{}, err
+	}
 
 	t.textBuffer = t.deserialise(bytes)
 	t.lines = len(t.contentBuffer)
 
-	return t.textBuffer
+	return t.textBuffer, nil
 }
 
 // Convert from byte format (lower level struct) to human readable strings (struct )
@@ -97,11 +99,11 @@ func (t *TextFile) SetLine(s string, i int, newline bool) {
 }
 
 func (f *TextFile) Append(s string, newline bool) {
-	f.SetLine(s, len(f.contentBuffer), newline)
+	f.SetLine(s, len(f.textBuffer), newline)
 }
 
 func (t *TextFile) AppendLastLine(s string) {
-	lastLine := len(t.contentBuffer) - 1
+	lastLine := len(t.textBuffer) - 1
 
 	if t.IsEmpty() {
 		lastLine = 0

@@ -14,6 +14,10 @@ var (
 	ErrNoFileOrDirectory       = helpers.WrapError("files: %w", syscall.ENOENT) // special error for "no such file or directory" error that happens sometimes
 )
 
-func addErrInconsistentFieldNumber(line int) error {
+func newErrInconsistentFieldNumber(line int) error {
 	return helpers.WrapError("%w at line %d", ErrInconsistentFieldNumber, line)
+}
+
+func newErrNoFileOrDirectory(filename string) error {
+	return helpers.WrapError("%w at file path: %s", ErrNoFileOrDirectory, filename)
 }

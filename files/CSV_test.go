@@ -15,7 +15,7 @@ var (
 
 func init() {
 	print("Initialising CSV_TEST")
-	defer print("Finished Initialising CSV_TEST")
+	defer print("Finished Initialising CSV_TEST\n")
 
 	standardCSV = NewCSVFile("./files/abc.csv", false)
 	errFieldCSV = NewCSVFile("./files/arbitraryFields.csv", false)
@@ -28,8 +28,9 @@ func TestReadContents(t *testing.T) {
 	t.Run("No Errors Expected", func(t *testing.T) {
 		csv := standardCSV
 
-		err := csv.ReadContents()
+		tab, err := csv.ReadContents()
 		helpers.AssertNoError(t, err)
+		helpers.AssertEqualsObject(t, csv.Table, tab)
 
 		helpers.AssertEqualsInt(t, 2, csv.Entries())
 		helpers.AssertEqualsInt(t, 4, csv.Width())
@@ -37,9 +38,10 @@ func TestReadContents(t *testing.T) {
 
 	t.Run("Headers", func(t *testing.T) {
 		csv := headersCSV
-		err := csv.ReadContents()
 
+		tab, err := csv.ReadContents()
 		helpers.AssertNoError(t, err)
+		helpers.AssertEqualsObject(t, csv.Table, tab)
 
 		head, err := csv.Headers()
 		helpers.AssertNoError(t, err)
@@ -52,12 +54,20 @@ func TestReadContents(t *testing.T) {
 
 	t.Run("ErrInconsistentFieldNumber Expected", func(t *testing.T) {
 		csv := errFieldCSV
-		err := csv.ReadContents()
 
-		helpers.Print(csv)
+		expectedTab := table.NewTable(2)
+		r1 := table.NewRow(2)
+		r1.Set(0, "sd")
+		r2 := table.NewRow(2)
+		r2.Set(0, "as")
+		r2.Set(1, "as")
+		expectedTab.AddRecord(r1)
+		expectedTab.AddRecord(r2)
 
-		// helpers.AssertEqualsInt(t, 3, csv.Rows())
+		tab, err := csv.ReadContents()
 		helpers.AssertError(t, err, ErrInconsistentFieldNumber)
+
+		helpers.AssertEqualsObject(t, expectedTab, tab)
 	})
 
 	// helpers.AssertEqualsInt(t, 0, 1)

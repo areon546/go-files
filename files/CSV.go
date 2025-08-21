@@ -43,7 +43,7 @@ func NewCSVFile(filename string, headings bool) *CSVFile {
 // Checks if there is a valid ab
 func ReadCSV(filename string, headings bool) (csv *CSVFile, err error) {
 	csv = NewCSVFile(filename, headings)
-	err = csv.ReadContents()
+	_, err = csv.ReadContents()
 	return csv, err
 }
 
@@ -51,17 +51,21 @@ func (csv *CSVFile) String() string {
 	return helpers.Format("File: %s\nHasHeadings: %t\nTable: \n%v\n", csv.file.Name(), csv.hasHeadings, csv.Table)
 }
 
-// Reading a CSV file
-// Returns ErrInconsistentFieldNumber if the number of rows is inconsistent.
-func (csv *CSVFile) ReadContents() (err error) {
+// Reads a CSV file.
+// Returns ErrInconsistentFieldNumber if the size of records is inconsistent between rows.
+func (csv *CSVFile) ReadContents() (tab *table.Table, err error) {
 	// Assumes the file attribute has been populated.
-	fileContents := csv.file.ReadContents()
+	fileContents, err := csv.file.ReadContents()
+	if err != nil {
+		return table.EmptyTable(), err
+	}
 
 	csv.Table, err = csv.deserialise(fileContents)
-	return err
+	return csv.Table, err
 }
 
-// Converts a []string that is supposed to represent a CSV file's lines, to a table
+// Converts a []string that is supposed to represent a CSV file's lines, to a table.
+// It will skip any rows with sizes incompatible with the given table size.
 func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 	t := table.EmptyTable()
 	err := errors.New("files/csv: Error occured while deserialising the given string array")
@@ -91,18 +95,17 @@ func (csv *CSVFile) deserialise(contents []string) (*table.Table, error) {
 		// TODO: To make compatible with RFC 4180, instead I could repeatedly cut a preffix using strings.Index(content, ",") and some more fancy logic
 
 		// Add Record to table.
-		recErr := t.AddRecord(row)
-		if recErr != nil {
-			if errors.Is(recErr, table.ErrIncompatibleSize) {
-				// Convert to
-				recErr = addErrInconsistentFieldNumber(line)
+		recordErr := t.AddRecord(row)
+		if recordErr != nil {
+			if errors.Is(recordErr, table.ErrIncompatibleSize) {
+				recordErr = newErrInconsistentFieldNumber(line)
 			}
 
 			// Create new error, ErrInconsistentFieldNumber, reference the line number,
 			lastLine := line == len(contents)-1
 
 			if !lastLine {
-				err = errors.Join(err, recErr)
+				err = errors.Join(err, recordErr)
 				errAdded = true
 			}
 		}
