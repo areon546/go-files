@@ -36,15 +36,15 @@ func (m markdownFormatter) Table(t table.Table) string {
 	headersRow, err := t.Headers()
 	if err != nil {
 		headers = constructRow(headersRow)
-		s += headers
+		s += headers + "\n"
 	}
 	headerDecleration := markdownHeaderDeclarationRow(t.Width())
 
-	s += headerDecleration
+	s += headerDecleration + "\n"
 
 	// Add records
 	for _, rec := range t.Iter() {
-		s += constructRow(rec)
+		s += constructRow(rec) + "\n"
 	}
 
 	return s
