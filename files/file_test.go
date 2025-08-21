@@ -170,6 +170,27 @@ func TestFileWriteContents(t *testing.T) {
 // 	})
 // }
 
+func TestRename(t *testing.T) {
+	f := realFile
+	o := realFile
+	helpers.AssertEquals(t, "./files/test.txt", realFile.FullPath())
+
+	new := "files/test2.txt"
+	path, fn := SplitFilePath(new)
+	f.Rename(path, fn)
+
+	helpers.AssertEquals(t, "./files/test2.txt", f.FullPath()) // Test the internal file path has changed
+	helpers.AssertEquals(t, "./files/test.txt", o.FullPath())
+
+	// Test it will write and not overwrite the original
+	err := f.WriteContents()
+	helpers.AssertNoError(t, err)
+
+	f2, err := OpenFile(new)
+	helpers.AssertNoError(t, err)
+	helpers.AssertEquals(t, string(o.Contents()), string(f2.Contents()))
+}
+
 // Name
 func TestName(t *testing.T) {
 	testCases := []struct {
@@ -180,12 +201,12 @@ func TestName(t *testing.T) {
 		{
 			desc:     "with /",
 			path:     "./file.txt",
-			expected: "./file.txt",
+			expected: "file.txt",
 		},
 		{
 			desc:     "without /",
 			path:     "file.txt",
-			expected: "./file.txt",
+			expected: "file.txt",
 		},
 		{
 			desc:     "empty",
@@ -204,27 +225,70 @@ func TestName(t *testing.T) {
 	}
 }
 
-func TestRename(t *testing.T) {
-	f := realFile
-	o := realFile
-	helpers.AssertEquals(t, "./files/test.txt", realFile.Name())
+// Path
+func TestPath(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		path     string
+		expected string
+	}{
+		{
+			desc:     "with /",
+			path:     "./file.txt",
+			expected: "./",
+		},
+		{
+			desc:     "without /",
+			path:     "file.txt",
+			expected: "./",
+		},
+		{
+			desc:     "empty",
+			path:     "",
+			expected: "./",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			// open file
+			file := NewFile(tC.path)
+			name := file.Path()
 
-	new := "files/test2.txt"
-	path, fn := SplitFilePath(new)
-	f.Rename(path, fn)
-
-	helpers.AssertEquals(t, "./files/test2.txt", f.Name()) // Test the internal file path has changed
-	helpers.AssertEquals(t, "./files/test.txt", o.Name())
-
-	// Test it will write and not overwrite the original
-	err := f.WriteContents()
-	helpers.AssertNoError(t, err)
-
-	f2, err := OpenFile(new)
-	helpers.AssertNoError(t, err)
-	helpers.AssertEquals(t, string(o.Contents()), string(f2.Contents()))
+			helpers.AssertEquals(t, tC.expected, name)
+		})
+	}
 }
 
 // Path
-func TestPath(t *testing.T) {
+func TestFullPath(t *testing.T) {
+	testCases := []struct {
+		desc     string
+		path     string
+		expected string
+	}{
+		{
+			desc:     "with /",
+			path:     "./file.txt",
+			expected: "./file.txt",
+		},
+		{
+			desc:     "without /",
+			path:     "file.txt",
+			expected: "./file.txt",
+		},
+		{
+			desc:     "empty",
+			path:     "",
+			expected: "./",
+		},
+	}
+	for _, tC := range testCases {
+		t.Run(tC.desc, func(t *testing.T) {
+			// open file
+			file := NewFile(tC.path)
+			name := file.FullPath()
+
+			helpers.AssertEquals(t, tC.expected, name)
+		})
+	}
 }

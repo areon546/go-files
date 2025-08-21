@@ -208,14 +208,14 @@ func (f *File) ReadContents() ([]byte, error) {
 	if err != nil && strings.Contains(err.Error(), "no such file or directory") {
 		fmt.Println(f.Name(), err)
 
-		err = newErrNoFileOrDirectory(f.Name())
+		err = newErrNoFileOrDirectory(f.FullPath())
 	}
 	return contents, err
 }
 
 // Load data from file to struct
 func (f *File) deserialise() ([]byte, error) {
-	bytes, err := os.ReadFile(f.Name())
+	bytes, err := os.ReadFile(f.FullPath())
 
 	return bytes, err
 }
@@ -277,13 +277,9 @@ func (f *File) String() string {
 	return "Name:" + f.Name() + "Size:" + helpers.IntegerToString(size)
 }
 
-// Returns the full name of the file.
-// The path + the file name.
+// Returns the file name.
 func (f *File) Name() string {
-	if f.filename == "" {
-		return ""
-	}
-	return f.Path() + f.filename
+	return f.filename
 }
 
 // Returns the directory of the specified file.
@@ -305,4 +301,12 @@ func (f *File) Path() string {
 	f.compiledFilePath = path
 
 	return f.compiledFilePath
+}
+
+func (f File) FullPath() string {
+	if f.filename == "" {
+		return f.Path()
+	}
+
+	return f.Path() + f.filename
 }
