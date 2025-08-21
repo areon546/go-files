@@ -173,14 +173,14 @@ func TestFileWriteContents(t *testing.T) {
 func TestRename(t *testing.T) {
 	f := realFile
 	o := realFile
-	helpers.AssertEquals(t, "./files/test.txt", realFile.FullPath())
+	helpers.AssertEquals(t, "./files/test.txt", realFile.FullName())
 
 	new := "files/test2.txt"
 	path, fn := SplitFilePath(new)
 	f.Rename(path, fn)
 
-	helpers.AssertEquals(t, "./files/test2.txt", f.FullPath()) // Test the internal file path has changed
-	helpers.AssertEquals(t, "./files/test.txt", o.FullPath())
+	helpers.AssertEquals(t, "./files/test2.txt", f.FullName()) // Test the internal file path has changed
+	helpers.AssertEquals(t, "./files/test.txt", o.FullName())
 
 	// Test it will write and not overwrite the original
 	err := f.WriteContents()
@@ -260,7 +260,7 @@ func TestPath(t *testing.T) {
 }
 
 // Path
-func TestFullPath(t *testing.T) {
+func TestFullName(t *testing.T) {
 	testCases := []struct {
 		desc     string
 		path     string
@@ -279,14 +279,14 @@ func TestFullPath(t *testing.T) {
 		{
 			desc:     "empty",
 			path:     "",
-			expected: "./",
+			expected: "",
 		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			// open file
 			file := NewFile(tC.path)
-			name := file.FullPath()
+			name := file.FullName()
 
 			helpers.AssertEquals(t, tC.expected, name)
 		})

@@ -124,8 +124,8 @@ func appendToFile(filename string, bytes []byte) (err error) {
 // Fulfills io.Writer interface.
 // Writes to the file, appending the given bytes.
 func (f *File) Write(p []byte) (n int, err error) {
-	err = appendToFile(f.Name(), p) // NOTE: this hass to append to fulfill the html template system, presumably stream means appending in this case
-	if err == nil {                 // tell the user that the file has been written to successfully, only if no error occurs
+	err = appendToFile(f.FullName(), p) // NOTE: this hass to append to fulfill the html template system, presumably stream means appending in this case
+	if err == nil {                     // tell the user that the file has been written to successfully, only if no error occurs
 		n = len(p) // simplistic answer
 	}
 	return
@@ -208,14 +208,15 @@ func (f *File) ReadContents() ([]byte, error) {
 	if err != nil && strings.Contains(err.Error(), "no such file or directory") {
 		fmt.Println(f.Name(), err)
 
-		err = newErrNoFileOrDirectory(f.FullPath())
+		err = newErrNoFileOrDirectory(f.FullName())
+		fmt.Println("ASDASDASD")
 	}
 	return contents, err
 }
 
 // Load data from file to struct
 func (f *File) deserialise() ([]byte, error) {
-	bytes, err := os.ReadFile(f.FullPath())
+	bytes, err := os.ReadFile(f.FullName())
 
 	return bytes, err
 }
@@ -249,7 +250,7 @@ func (f *File) Append(bytes []byte) {
 
 // Resets the actual file's contents. Helpful if writing to a pre-existing file and you don't care about the original content.
 func (f *File) ClearFile() error {
-	return writeToFile(f.Name(), make([]byte, 0))
+	return writeToFile(f.FullName(), make([]byte, 0))
 }
 
 /* Misc methods */
@@ -303,9 +304,9 @@ func (f *File) Path() string {
 	return f.compiledFilePath
 }
 
-func (f File) FullPath() string {
+func (f File) FullName() string {
 	if f.filename == "" {
-		return f.Path()
+		return ""
 	}
 
 	return f.Path() + f.filename
