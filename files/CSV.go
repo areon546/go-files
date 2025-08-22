@@ -132,7 +132,7 @@ func (c *CSVFile) WriteContents() {
 	contents := c.serialise(c.Table) // TODO: handle this error
 
 	c.file.ClearFile()
-	c.file.AppendLines(contents, true)
+	c.file.AppendLines(contents)
 	c.file.WriteContents()
 }
 

@@ -86,22 +86,21 @@ func (f *TextFile) Contents() []string {
 
 // ~~~ Append
 
-func (t *TextFile) SetLine(s string, i int, newline bool) {
+func (t *TextFile) SetLine(s string, i int) {
 	for i >= len(t.textBuffer) {
 		t.textBuffer = append(t.textBuffer, s)
-	}
-
-	if newline {
-		s += "\n"
+		return
 	}
 
 	t.textBuffer[i] = s
 }
 
-func (f *TextFile) Append(s string, newline bool) {
-	f.SetLine(s, len(f.textBuffer), newline)
+func (f *TextFile) Append(s string) {
+	f.SetLine(s, len(f.textBuffer))
 }
 
+// This adds the specified line at the end of the text.
+// If
 func (t *TextFile) AppendLastLine(s string) {
 	lastLine := len(t.textBuffer) - 1
 
@@ -109,19 +108,19 @@ func (t *TextFile) AppendLastLine(s string) {
 		lastLine = 0
 	}
 
-	t.SetLine(s, lastLine, true)
+	t.SetLine(s, lastLine)
 }
 
-func (t *TextFile) AppendLines(arr []string, newline bool) {
+func (t *TextFile) AppendLines(arr []string) {
 	for _, v := range arr {
-		t.Append(v, newline)
+		t.Append(v)
 	}
 }
 
 func (f *TextFile) AppendNewLine(s string) {
-	f.Append(s, true)
+	f.Append(s)
 }
 
 func (t *TextFile) AppendEmptyLine() {
-	t.Append("", true)
+	t.Append("")
 }

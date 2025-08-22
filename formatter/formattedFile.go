@@ -35,21 +35,21 @@ func newFormattedFile(fmt Formatter, filePath string) *FormattedFile {
 }
 
 func (m *FormattedFile) AppendLink(displayText, path string) {
-	m.Append(m.Fmt.Link(displayText, path), false)
+	m.Append(m.Fmt.Link(displayText, path))
 }
 
 func (m *FormattedFile) AppendEmbed(path, alt string) {
-	m.Append(m.Fmt.Embed(path, alt), false)
+	m.Append(m.Fmt.Embed(path, alt))
 }
 
 func (m *FormattedFile) AppendHeading(tier int, heading string) {
-	m.Append(m.Fmt.Heading(tier, heading), false)
+	m.Append(m.Fmt.Heading(tier, heading))
 }
 
 func (m *FormattedFile) AppendItalics(heading string) {
-	m.Append(m.Fmt.Italic(heading), false)
+	m.Append(m.Fmt.Italic(heading))
 }
 
 func (m *FormattedFile) AppendBold(heading string) {
-	m.Append(m.Fmt.Bold(heading), false)
+	m.Append(m.Fmt.Bold(heading))
 }
