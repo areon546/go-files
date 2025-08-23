@@ -32,9 +32,8 @@ func (m markdownFormatter) Table(t table.Table) string {
 	s := ""
 	headers := ""
 
-	// TODO: Need to create Headers, to be able to fix the formatter implementation, to be able to fix the NovaSkins file writing for asset pages implementation.
-	headersRow, err := t.Headers()
-	if err != nil {
+	headersRow, _ := t.Headers()
+	if t.HasHeaders() {
 		headers = constructRow(headersRow)
 		s += headers + "\n"
 	}

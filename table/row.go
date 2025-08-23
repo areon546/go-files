@@ -91,7 +91,8 @@ func (r *row) Join(beforeRow, cellPre, inbetweenCells, cellSuff, afterRow string
 	for i, cell := range r.cells {
 		str += cellPre + cell.value + cellSuff
 
-		if i != r.size {
+		// DO NOT add `inbetweenCells` for the very last cell
+		if i < r.size-1 { // -1 because `i` is an index, while `size` is a length
 			str += inbetweenCells
 		}
 	}
