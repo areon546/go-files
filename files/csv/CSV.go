@@ -1,16 +1,12 @@
-package files
+package csv
 
 import (
 	"errors"
 	"strings"
 
-	"github.com/areon546/go-files/table"
+	"github.com/areon546/go-ds/table"
+	"github.com/areon546/go-files/files"
 	"github.com/areon546/go-helpers/helpers"
-)
-
-var (
-	errMissingHeaders error = errors.New("headings are missing")
-	ErrMissingHeaders error = helpers.WrapError("%w %w", errFiles, errMissingHeaders)
 )
 
 // ~~~~~~~~~~~~~~~~~~~~ CSVFile
@@ -18,8 +14,8 @@ var (
 // NOTE: This struct has the same format as TextFile and File.
 // Convenient usage is: ReadContents() and WriteContents()
 type CSVFile struct {
-	*table.Table           // I want all Table methods to be available.
-	file         *TextFile // I want to control access to file methods and overwrite them as need by
+	*table.Table                 // I want all Table methods to be available.
+	file         *files.TextFile // I want to control access to file methods and overwrite them as need by
 	hasHeadings  bool
 }
 
@@ -31,8 +27,8 @@ type CSVFile struct {
 // -
 
 func NewCSVFile(filename string, headings bool) *CSVFile {
-	filename = AddFileType(filename, "csv") // redundant check to see if the file is a CSV file, ensures it is if it isn't already
-	file := NewTextFile(filename)
+	filename = files.AddFileType(filename, "csv") // redundant check to see if the file is a CSV file, ensures it is if it isn't already
+	file := files.NewTextFile(filename)
 
 	table := table.NewTable(0)
 
@@ -145,7 +141,7 @@ func (csv *CSVFile) serialise(table *table.Table) (contents []string) {
 		contents = append(contents, line)
 	}
 
-	return
+	return contents
 }
 
 func (c *CSVFile) Contents() []string {

@@ -1,8 +1,8 @@
 package formatter
 
 import (
+	"github.com/areon546/go-ds/table"
 	"github.com/areon546/go-files/files"
-	"github.com/areon546/go-files/table"
 )
 
 type Formatter interface {

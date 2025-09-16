@@ -1,9 +1,9 @@
-package files
+package csv
 
 import (
 	"testing"
 
-	"github.com/areon546/go-files/table"
+	"github.com/areon546/go-ds/table"
 	"github.com/areon546/go-helpers/helpers"
 )
 
@@ -17,9 +17,9 @@ func init() {
 	print("Initialising CSV_TEST")
 	defer print("Finished Initialising CSV_TEST\n")
 
-	standardCSV = NewCSVFile("./files/abc.csv", false)
-	errFieldCSV = NewCSVFile("./files/arbitraryFields.csv", false)
-	headersCSV = NewCSVFile("./files/headers.csv", true)
+	standardCSV = NewCSVFile("../files/abc.csv", false)
+	errFieldCSV = NewCSVFile("../files/arbitraryFields.csv", false)
+	headersCSV = NewCSVFile("../files/headers.csv", true)
 }
 
 func TestReadContents(t *testing.T) {

@@ -63,7 +63,7 @@ Close - writes buffer
 func OpenFile(path string) (f *File, err error) {
 	f = NewFile(path)
 	_, err = f.ReadContents()
-	return
+	return f, err
 }
 
 // Creates a new file at a specified directory.
@@ -97,12 +97,12 @@ func EmptyFile() *File {
 
 // Writes to the specified file.
 func writeToFile(filename string, bytes []byte) error {
-	return os.WriteFile(filename, bytes, 0644)
+	return os.WriteFile(filename, bytes, 0o644)
 }
 
 // Appends to the specified file.
 func appendToFile(filename string, bytes []byte) (err error) {
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (f *File) Write(p []byte) (n int, err error) {
 	if err == nil {                     // tell the user that the file has been written to successfully, only if no error occurs
 		n = len(p) // simplistic answer
 	}
-	return
+	return n, err
 }
 
 // copied from io.go
@@ -193,7 +193,7 @@ func (f *File) Read(p []byte) (n int, err error) {
 	f.bytesRead += n
 	// helpers.Print(l, len(p), f.Name(), "bytes read", f.bytesRead)
 	// time.Sleep(time.Millisecond * 400)
-	return
+	return n, err
 }
 
 // Read the contents of the file into the file buffer.
@@ -221,7 +221,7 @@ func (f *File) deserialise() ([]byte, error) {
 	return bytes, err
 }
 
-// Writes the content buffer to the file in the file system.
+// WriteContents writes the content buffer to the file in the file system.
 func (f *File) WriteContents() error {
 	return f.serialise(f.Contents())
 }
