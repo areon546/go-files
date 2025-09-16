@@ -20,7 +20,7 @@ var (
 
 // This file contains all of the methods relating to directory management and checking.
 
-// This function
+// ReadDirectory returns the contents of the specified path as an array of Directory Entries.
 func ReadDirectory(dirPath string) (entries []fs.DirEntry) {
 	debugPrint("Reading directory ", dirPath)
 
@@ -29,39 +29,40 @@ func ReadDirectory(dirPath string) (entries []fs.DirEntry) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return
+	return entries
 }
 
-// Checks if a specific file exists within the file system or not.
-// If it does exist, it returns true, and the os.FileInfo entry that can be gained by os.Stat.
-// If it does not exist, it returns false, nil.
+// FileExists checks if the specified path is a file, or not.
+// If the file doesn't exist, it returns false, nil
 func FileExists(path string) (exists bool, info os.FileInfo) {
 	info, err := os.Stat(path)
 
-	if errors.Is(err, fs.ErrNotExist) {
-		exists = false
-	} else {
-		exists = true && !info.IsDir()
-	}
+	fileExists := !errors.Is(err, fs.ErrNotExist)
+	notDirectory := !info.IsDir()
 
-	return
+	exists = fileExists && notDirectory
+
+	return exists, info
 }
 
-// Checks if a specific directory exists.
+// DirExists checks if the specified path is a directory.
+// If the directory doesn't exist, it returns false, nil.
 func DirExists(path string) (exists bool, info os.FileInfo) {
 	info, err := os.Stat(path)
 
-	if errors.Is(err, fs.ErrNotExist) {
-		exists = false
-	} else {
-		exists = true && info.IsDir()
-	}
+	dirExists := !errors.Is(err, fs.ErrNotExist)
+	isDirectory := info.IsDir()
 
-	return
+	exists = dirExists && isDirectory
+
+	return exists, info
 }
 
 // Creates directories at the specified path.
 // Returns an error if there is an issue creating the directories, or if the path is not a directory path.
+
+// MakeDirectory creates a chain of directories based on the path.
+// EG If you ask it to make `~/aasddd/text/no`, and none of those directories exists, it would make them repeatedly.
 func MakeDirectory(path string) error {
 	if PathIsDir(path) {
 		err := os.MkdirAll(path, os.ModePerm)
@@ -118,7 +119,7 @@ func ValidDirectoryName(dir string) (isValid bool) {
 
 	debugPrint("ValidDirectoryName output", isValid, ":", !dotDirectory, !onlySpaces, validCharacters)
 
-	return
+	return isValid
 }
 
 // Checks if the filename specified is valid.
