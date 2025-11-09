@@ -13,6 +13,10 @@ type SQLiteFile struct {
 	db *sql.DB
 }
 
+// Open uses the database source name to connect to a database.
+// See the following for more information:
+// - https://github.com/mattn/go-sqlite3?tab=readme-ov-file#connection-string
+// - https://en.wikipedia.org/wiki/Data_source_name
 func Open(dsn string) (*SQLiteFile, error) {
 	slite := &SQLiteFile{}
 
