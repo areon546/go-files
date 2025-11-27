@@ -80,7 +80,7 @@ type ZipCrawler struct {
 	root string
 }
 
-// To handle files, we simply write the file contents to the zip file in the location specified by the path.
+// HandleFile writes the file contents to the zip file in the location specified by the path.
 func (c *ZipCrawler) HandleFile(path string) {
 	file, err := files.OpenFile(path)
 
@@ -89,7 +89,7 @@ func (c *ZipCrawler) HandleFile(path string) {
 	c.AddZipFile(path, file)
 }
 
-// To handle folders we simply recursively call Crawl on the folder being zipped.
+// HandleFolder recursively call Crawl on the folder being zipped.
 func (c *ZipCrawler) HandleFolder(path string) {
 	originalPath := c.path
 
@@ -169,8 +169,6 @@ func ZipFolder(path, output string) {
 		if err != nil {
 			return err
 		}
-
-		printf("%v", fileBeingZipped)
 
 		// here we copy the contents in the physical file to the virtual file being zipped
 		_, err = io.Copy(fileBeingZipped, fileToZip)
