@@ -247,6 +247,11 @@ func TestPath(t *testing.T) {
 			path:     "",
 			expected: "./",
 		},
+		{
+			desc:     "present, as test ",
+			path:     "/etc/passwd",
+			expected: "/etc/",
+		},
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {

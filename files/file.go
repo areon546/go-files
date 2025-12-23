@@ -289,7 +289,7 @@ func (f *File) Path() string {
 	path := f.path
 
 	emptyPath := reflect.DeepEqual(path, "")
-	pathPreffix := strings.HasPrefix(path, "./")
+	pathPreffix := strings.HasPrefix(path, "./") || strings.HasPrefix(path, "/")
 	if emptyPath || !pathPreffix {
 		path = "./" + path
 	}
