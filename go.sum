@@ -1,5 +1,7 @@
 github.com/areon546/go-ds v0.0.0-20250916095538-f46f7b848a25 h1:PHFReYO1K97zsxynMFbH3iEFeWNMrEXBHozjXkqkQTc=
 github.com/areon546/go-ds v0.0.0-20250916095538-f46f7b848a25/go.mod h1:epg6iW5NlvENNzdm3C3zGcbka5e/rmsjaOf3x4sjSfY=
+github.com/areon546/go-ds v0.0.0-20250917144558-70e2cd67cd8d h1:GDbUY1iHIWL9pBI180t58J2y02H+KzbHrD4oO5AokW0=
+github.com/areon546/go-ds v0.0.0-20250917144558-70e2cd67cd8d/go.mod h1:epg6iW5NlvENNzdm3C3zGcbka5e/rmsjaOf3x4sjSfY=
 github.com/areon546/go-helpers v0.0.0-20250820120313-8a98e4eca6e5 h1:djA5yPn2QbiY/GLFkq+HPql6oFFFHbWnZe4Ys7Um25c=
 github.com/areon546/go-helpers v0.0.0-20250820120313-8a98e4eca6e5/go.mod h1:pN+CQkoKXPG5/CV6P19/T3T9xcsKCtdj38zabkFuspA=
 github.com/areon546/go-helpers/helpers v0.0.0-20250224183828-02568d242d34 h1:OuZ0ONgMeCpJsZb/bwcHcKD815IRnrfQz3qDUmwr9uk=

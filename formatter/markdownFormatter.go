@@ -1,8 +1,6 @@
 package formatter
 
-import (
-	"github.com/areon546/go-files/table"
-)
+import "github.com/areon546/go-ds/table"
 
 type markdownFormatter struct{}
 
