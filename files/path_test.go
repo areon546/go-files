@@ -177,7 +177,7 @@ func TestJoinDirs(t *testing.T) {
 	}
 	for _, tC := range testCases {
 		t.Run(tC.desc, func(t *testing.T) {
-			path := JoinDirs(tC.dirs)
+			path := JoinDirs(tC.dirs...)
 
 			helpers.AssertEquals(t, tC.path, path)
 		})

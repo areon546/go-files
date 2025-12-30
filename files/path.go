@@ -1,6 +1,7 @@
 package files
 
 import (
+	"path/filepath"
 	"reflect"
 	"strings"
 )
@@ -73,8 +74,8 @@ func SplitFilePath(filePath string) (path, filename string) {
 	return path, filename
 }
 
-func JoinDirs(dirs []string) (dirPath string) {
-	return strings.Join(dirs, "/") + "/"
+func JoinDirs(dirs ...string) (dirPath string) {
+	return filepath.Join(dirs...) + "/"
 }
 
 // Name is the whole name up to the very very last .xxx at the end of a filename.
